@@ -17,9 +17,9 @@ const getEventById: Response = (req: Request, res: Response) => {
                     id: eventId
                 }})
     if (!event) {
-        return res.status(404).json({})
+        return res.status(404).json({error: "event does not exist"})
     }
-    return res.status(200).json({})
+    return res.status(200).json({message: "success"})
 }
 
 export { createEvent, getAllEvents, getFriendEvent, eventSearch, getEventById }
