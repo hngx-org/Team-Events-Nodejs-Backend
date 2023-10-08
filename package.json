@@ -4,7 +4,7 @@
   "main": "dist/index",
   "scripts": {
     "start": "node src/index",
-    "start:dev": "nodemon",
+    "dev": "nodemon",
     "build": "tsc",
     "postBuild": "mv node_modules ./dist"
   },
