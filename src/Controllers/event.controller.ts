@@ -10,6 +10,16 @@ const getFriendEvent = (req: Request, res: Response) => {}
 
 const eventSearch = (req: Request, res: Response) => {}
 
-const getEventById = (req: Request, res: Response) => {}
+const getEventById: Response = (req: Request, res: Response) => {
+    const eventId: string = req.params.eventId
+    const event = prisma.event.findFirst({
+                    where: {
+                    id: eventId
+                }})
+    if (!event) {
+        return res.status(404).json({})
+    }
+    return res.status(200).json({})
+}
 
 export { createEvent, getAllEvents, getFriendEvent, eventSearch, getEventById }
