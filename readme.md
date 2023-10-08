@@ -15,6 +15,8 @@ Also run:
 ```
 To view added tables and content. You can also manipulate fields when necessary.
 
+Look at prisma [docs](https://www.prisma.io/docs/concepts/components/prisma-client/crud) for CRUD operations.
+
 ## Installation
 1. Clone this repository:
 ```bash
