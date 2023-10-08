@@ -26,7 +26,13 @@ Look at prisma [docs](https://www.prisma.io/docs/concepts/components/prisma-clie
 ```bash
   yarn install
 ```
-3. Start the server:
+3. Create .env file and add keys
+
+4. Prisma generate
+```
+  npx prisma generate
+```
+5. Start the server:
   ```bash
     yarn start:dev
   ```
