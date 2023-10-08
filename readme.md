@@ -9,6 +9,12 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient()
 ```
 
+Also run:
+```
+  npx prisma studio
+```
+To view added tables and content. You can also manipulate fields when necessary.
+
 ## Installation
 1. Clone this repository:
 ```bash
@@ -22,3 +28,6 @@ const prisma = new PrismaClient()
   ```bash
     yarn start:dev
   ```
+
+## Usage
+After looking at what your ticket create a branch checkout into that branch locate your route and controller and add the logic. After testing push to your branch and create a PR on github. 
