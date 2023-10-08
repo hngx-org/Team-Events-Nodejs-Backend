@@ -17,9 +17,16 @@ const getEventById: Response = (req: Request, res: Response) => {
                     id: eventId
                 }})
     if (!event) {
-        return res.status(404).json({error: "event does not exist"})
+        return res.status(404).json({
+            statusCode: 404,
+            message: "Resource could not be found",
+            error: "Specified event does not exist"
+        })
     }
-    return res.status(200).json({message: "success"})
+    return res.status(200).json({
+        statusCode: 200,
+        message: "success"
+    })
 }
 
 export { createEvent, getAllEvents, getFriendEvent, eventSearch, getEventById }
