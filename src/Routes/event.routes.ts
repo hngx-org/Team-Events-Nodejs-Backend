@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import upload from "../config/multer-cloudinary-config"; 
 import {
 	createEvent,
 	eventSearch,
@@ -13,7 +14,7 @@ const router = Router()
  * This route should take care of creating events should return a 201
  * PROTECTED ROUTE
  */
-// router.post('/',upload.single('image'), createEvent)
+router.post('/',upload.single('image'), createEvent)
 
 /*@GET /event
  * This route should take care of getting events created by all users
