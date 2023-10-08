@@ -142,7 +142,25 @@ const eventSearch = async (req: Request, res: Response) => {
 
 }
 
-const getEventById = (req: Request, res: Response) => {}
+const getEventById = async (req: Request, res: Response) => {
+    const eventId: string = req.params.eventId
+    const event = await prisma.event.findFirst({
+                    where: {
+                    id: eventId
+                }})
+    if (!event) {
+        return res.status(404).json({
+            statusCode: 404,
+            message: "Resource could not be found",
+            error: "Specified event does not exist"
+        })
+    }
+    return res.status(200).json({
+        data: event,
+        statusCode: 200,
+        message: "success"
+    })
+}
 
 const deleteEvent = async (req: Request, res: Response) => {
 	const eventId = req.params.eventId
