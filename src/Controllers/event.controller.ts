@@ -10,7 +10,7 @@ const getFriendEvent = (req: Request, res: Response) => {}
 
 const eventSearch = (req: Request, res: Response) => {}
 
-const getEventById: Response = async (req: Request, res: Response) => {
+const getEventById = async (req: Request, res: Response) => {
     const eventId: string = req.params.eventId
     const event = await prisma.event.findFirst({
                     where: {
