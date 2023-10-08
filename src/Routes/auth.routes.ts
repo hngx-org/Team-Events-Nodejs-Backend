@@ -1,11 +1,17 @@
 import { Router } from 'express'
-import { googleAuth, logout, twitterAuth } from '../Controllers/auth.controller'
+import {
+  callback,
+  googleAuth,
+  logout,
+  twitterAuth,
+} from '../Controllers/auth.controller'
 const router = Router()
 
-/*@Post /auth/google
+/*@GET /auth/google
  * This route should take care of login and signup
  */
-router.post('/google', googleAuth)
+router.get('/google', googleAuth)
+router.get('/callback', callback)
 
 /*@Post /auth/twitter
  *This route should take care of login and signup
