@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node dist/index",
     "start:dev": "nodemon",
-    "build": "tsc"
+    "build": "tsc",
+    "postBuild": "mv node_modules ./dist"
   },
   "license": "MIT",
   "devDependencies": {
