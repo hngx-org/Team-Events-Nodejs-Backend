@@ -24,6 +24,7 @@ const getEventById: Response = (req: Request, res: Response) => {
         })
     }
     return res.status(200).json({
+        data: event,
         statusCode: 200,
         message: "success"
     })
