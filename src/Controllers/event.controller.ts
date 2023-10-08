@@ -88,7 +88,59 @@ const getFriendEvent = async (req: Request, res: Response) => {
 	}
 }
 
-const eventSearch = (req: Request, res: Response) => {}
+const eventSearch = async (req: Request, res: Response) => {
+	if (typeof req.query.keyword != "string") {
+		return res.status(400).json({
+			error: "invalid keyword value",
+			message: "keyword must be a string",
+			statusCode: 400
+		})
+	}
+	const keyWord: string = req.query.keyword;
+	try {
+		const searchResults = await prisma.event.findMany({
+		  where: {
+			OR: [
+			  {
+				event_name: {
+				  contains: keyWord,
+				  mode: 'insensitive', // Perform case-insensitive search
+				},
+			  },
+			  {
+				event_description: {
+				  contains: keyWord,
+				  mode: 'insensitive',
+				},
+			  },
+			],
+		  },
+		});
+
+		if (searchResults.length  === 0){
+			return  res.status(404).json({
+				error: "A match could not be  found",
+				message: "No match was found",
+				statusCode: 404
+			})
+		}
+		return  res.status(200).json({
+			statusCode:  200,
+			message: "successful",
+			data: searchResults
+		})
+	  } catch (error) {
+		res.status(500).json({
+			error: "Something went wrong when trying to search for event",
+			message: error.message,
+			statusCode: 500
+		})
+	  }
+
+	
+	
+
+}
 
 const getEventById = (req: Request, res: Response) => {}
 
