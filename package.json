@@ -2,12 +2,12 @@
   "name": "sample",
   "version": "1.0.0",
   "main": "dist/index.js",
+  "license":"MIT",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "nodemon",
+    "start:dev": "nodemon",
     "build": "tsc"
   },
-  "license": "MIT",
   "devDependencies": {
     "@types/cors": "^2.8.14",
     "@types/express": "^4.17.18",
