@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "nodemon",
     "dev": "nodemon",
-    "build": "tsc",
-    "postbuild": "mv node_modules ./dist"
+    "build": "tsc"
   },
   "license": "MIT",
   "devDependencies": {
