@@ -5,8 +5,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon",
-    "build": "tsc",
-    "postBuild": "mv node_modules ./dist"
+    "build": "tsc"
   },
   "license": "MIT",
   "devDependencies": {
