@@ -51,7 +51,7 @@ const callback = async (req: Request, res: Response) => {
       //return token
       res.status(200).json({
         statusCode: 200,
-        message: 'User created',
+        message: 'User login successful',
         data: {
           id: userExists.id,
           token,
@@ -61,6 +61,9 @@ const callback = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Authentication error:', error)
     res.status(500).send('Authentication error')
+  } finally {
+    // Close the Prisma client at the end of the function
+    prisma.$disconnect()
   }
 }
 
