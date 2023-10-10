@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
 import { authUrl, oauth2Client, google } from '../config/google.config'
 import { generateToken } from '../utils'
+import passport from 'passport'
 const prisma = new PrismaClient()
 
 const googleAuth = (req: Request, res: Response) => {
@@ -66,8 +67,34 @@ const callback = async (req: Request, res: Response) => {
   }
 }
 
-const twitterAuth = (req: Request, res: Response) => {}
+const twitterAuth = (req: Request, res: Response) => {
+    //start the twitter authentication flow
+    passport.authenticate('twitter')(req, res);
+}
 
-const logout = (req: Request, res: Response) => {}
+//controller function to handle the twitter callback
+const twitterAuthCallback = (req: Request, res: Response) => {
+    //handle twitter callback
+    passport.authenticate('twitter', (err: any, user: any) => {
+        if (err) {
+            //handle authentication errors
+            return res.status(500).json({ error: 'Authentication error'});
+        }
+        if (!user) {
+            //authentication failed
+            return res.status(401).json({ error: 'Authentication failed'});
+        }
 
-export { googleAuth, twitterAuth, logout, callback }
+        //authentication succeeded
+        const accessToken = generateToken(user.id);
+        res.status(200).json({ user, accessToken });
+    })(req, res);
+};
+
+const logout = (req: Request, res: Response) => {
+    (req as any).logout(); //logout the user
+
+    res.redirect('/') //redirects to the homepage
+}
+
+export { googleAuth, twitterAuth, logout, callback, twitterAuthCallback }
