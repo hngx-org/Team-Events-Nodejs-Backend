@@ -4,6 +4,7 @@ import {
   googleAuth,
   logout,
   twitterAuth,
+  twitterAuthCallback
 } from '../Controllers/auth.controller'
 const router = Router()
 
@@ -17,6 +18,7 @@ router.get('/callback', callback)
  *This route should take care of login and signup
  */
 router.post('/twitter', twitterAuth)
+router.post('/callback', twitterAuthCallback)
 
 /*@Post /auth/logout
  *This route should take care of login out(clearing the access tokens)
