@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import multer from 'multer'
+const multer = require("multer");
 import * as path from 'path'
 
 // multer config

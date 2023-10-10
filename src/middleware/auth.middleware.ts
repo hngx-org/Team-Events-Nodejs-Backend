@@ -1,20 +1,20 @@
-import jwt from 'jsonwebtoken'
-import { Request, Response, NextFunction } from 'express'
-import { PrismaClient } from '@prisma/client'
+import * as jwt from "jsonwebtoken";
+import { Request, Response, NextFunction } from "express";
+import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 const protect = async (req: Request, res: Response, next: NextFunction) => {
-  let token
+  let token;
 
   if (
     req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
+    req.headers.authorization.startsWith("Bearer")
   ) {
     try {
-      token = req.headers.authorization.split(' ')[1]
+      token = req.headers.authorization.split(" ")[1];
 
-      const decoded: any = jwt.verify(token, process.env.SECRET_KEY)
+      const decoded: any = jwt.verify(token, process.env.SECRET_KEY);
 
       req.user = await prisma.user.findUnique({
         where: {
@@ -24,24 +24,24 @@ const protect = async (req: Request, res: Response, next: NextFunction) => {
           id: true,
           email: true,
         },
-      })
+      });
 
-      next()
+      next();
     } catch (error) {
-      console.error(error)
+      console.error(error);
       res.status(401).json({
         status: 401,
-        message: 'There was an issue authorizing token',
+        message: "There was an issue authorizing token",
         data: null,
-      })
+      });
     }
   } else {
     res.status(401).json({
       status: 401,
-      message: 'Unauthorized',
+      message: "Unauthorized",
       data: null,
-    })
+    });
   }
-}
+};
 
-export default protect
+export default protect;
