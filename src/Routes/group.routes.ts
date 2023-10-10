@@ -16,7 +16,7 @@ router.post('/', createGroup)
  * This route should take care of getting all groups user is in
  */
 
-router.get('/', getUserGroups)
+router.get('/:id', getUserGroups)
 
 /*@GET /group/info/:groupId
  * This route should take care of getting a particular group
