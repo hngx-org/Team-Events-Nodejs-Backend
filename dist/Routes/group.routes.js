@@ -10,7 +10,7 @@ router.post('/', group_controller_1.createGroup);
 /*@GET /group
  * This route should take care of getting all groups user is in
  */
-router.get('/', group_controller_1.getUserGroups);
+router.get('/:id', group_controller_1.getUserGroups);
 /*@GET /group/info/:groupId
  * This route should take care of getting a particular group
  */

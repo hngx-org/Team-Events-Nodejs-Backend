@@ -47,7 +47,7 @@ const callback = async (req, res) => {
             //return token
             res.status(200).json({
                 statusCode: 200,
-                message: 'User created',
+                message: 'User login successful',
                 data: {
                     id: userExists.id,
                     token,
