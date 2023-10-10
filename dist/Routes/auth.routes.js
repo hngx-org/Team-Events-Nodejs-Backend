@@ -12,6 +12,7 @@ router.get('/callback', auth_controller_1.callback);
  *This route should take care of login and signup
  */
 router.post('/twitter', auth_controller_1.twitterAuth);
+router.post('/callback', auth_controller_1.twitterAuthCallback);
 /*@Post /auth/logout
  *This route should take care of login out(clearing the access tokens)
  */

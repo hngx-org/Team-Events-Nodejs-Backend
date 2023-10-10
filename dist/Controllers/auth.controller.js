@@ -1,9 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.callback = exports.logout = exports.twitterAuth = exports.googleAuth = void 0;
+exports.twitterAuthCallback = exports.callback = exports.logout = exports.twitterAuth = exports.googleAuth = void 0;
 const client_1 = require("@prisma/client");
 const google_config_1 = require("../config/google.config");
 const utils_1 = require("../utils");
+const passport_1 = __importDefault(require("passport"));
 const prisma = new client_1.PrismaClient();
 const googleAuth = (req, res) => {
     res.redirect(google_config_1.authUrl);
@@ -65,8 +69,32 @@ const callback = async (req, res) => {
     }
 };
 exports.callback = callback;
-const twitterAuth = (req, res) => { };
+const twitterAuth = (req, res) => {
+    //start the twitter authentication flow
+    passport_1.default.authenticate('twitter')(req, res);
+};
 exports.twitterAuth = twitterAuth;
-const logout = (req, res) => { };
+//controller function to handle the twitter callback
+const twitterAuthCallback = (req, res) => {
+    //handle twitter callback
+    passport_1.default.authenticate('twitter', (err, user) => {
+        if (err) {
+            //handle authentication errors
+            return res.status(500).json({ error: 'Authentication error' });
+        }
+        if (!user) {
+            //authentication failed
+            return res.status(401).json({ error: 'Authentication failed' });
+        }
+        //authentication succeeded
+        const accessToken = (0, utils_1.generateToken)(user.id);
+        res.status(200).json({ user, accessToken });
+    })(req, res);
+};
+exports.twitterAuthCallback = twitterAuthCallback;
+const logout = (req, res) => {
+    req.logout(); //logout the user
+    res.redirect('/'); //redirects to the homepage
+};
 exports.logout = logout;
 //# sourceMappingURL=auth.controller.js.map
