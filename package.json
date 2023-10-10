@@ -4,9 +4,13 @@
 	"main": "dist/index.js",
 	"license": "MIT",
 	"scripts": {
-		"start": "yarn tsc && node dist/index.js",
+		"start": "tsc && node dist/index.js",
 		"start:dev": "nodemon",
-		"build": "yarn tsc"
+		"build": "tsc",
+		"build:deploy": "yarn install && echo 'No build needed'"
+	},
+	"engines": {
+		"node": ">=16.13.0"
 	},
 	"devDependencies": {
 		"@types/cors": "^2.8.14",
