@@ -39,46 +39,6 @@ const createEvent = async (req: Request, res: Response) => {
   }
 }
 
-//update event
-const updateEvent = async (req: Request, res: Response) => {
-  try {
-    const {
-      created_by,
-      event_name,
-      event_description,
-      event_start,
-      event_end,
-      location,
-    } = req.body
-
-    const { secure_url } = await cloudinary.uploader.upload(req.file.path)
-
-    const updateEvent: Event = await prisma.event.update({
-      where:{
-        id: req.params.id,
-      },
-      data: {
-        created_by,
-        event_name,
-        event_description,
-        image: secure_url,
-        event_start,
-        event_end,
-        location,
-      },
-    })
-
-    res.status(201).json({
-      statusCode: 201,
-      message: 'Event updated successfully',
-      data: updateEvent,
-    })
-  } catch (error) {
-    console.error('Error creating event:', error)
-    res.status(500).json({ error: 'Internal server error' })
-  }
-}
-
 const getAllEvents = async (req: Request, res: Response) => {
   // Get all events
   const events = await prisma.event.findMany()
@@ -216,5 +176,4 @@ export {
   eventSearch,
   getEventById,
   deleteEvent,
-  updateEvent,
 }
