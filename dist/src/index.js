@@ -43,7 +43,7 @@ app.use((0, cors_1.default)({ origin: '*' }));
 app.use(express_1.default.json());
 (0, connect_db_1.default)();
 app.use('/api', index_1.default);
-app.use("/api-docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerDocument));
+app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerDocument));
 const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
