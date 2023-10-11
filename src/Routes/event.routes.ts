@@ -7,6 +7,7 @@ import {
 	getEventById,
 	getFriendEvent,
 	deleteEvent,
+	updateEvent,
 } from '../Controllers/event.controller'
 const router = Router()
 
@@ -15,6 +16,12 @@ const router = Router()
  * PROTECTED ROUTE
  */
 router.post('/',upload.single('image'), createEvent)
+
+/*@PUT /update-event/:id
+ * This route should take care of updating events should return a 201
+ * PROTECTED ROUTE
+ */
+router.put('/update-event/:id',upload.single('image'), updateEvent)
 
 /*@GET /event
  * This route should take care of getting events created by all users
