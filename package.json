@@ -1,13 +1,14 @@
 {
 	"name": "sample",
 	"version": "1.0.0",
-	"main": "dist/index.js",
+	"main": "dist/src/index.js",
 	"license": "MIT",
 	"scripts": {
 		"start": "tsc && node dist/index.js",
 		"start:dev": "nodemon",
 		"test": "jest --watchAll --verbose",
 		"build": "tsc",
+		"start:deploy": "node dist/src/index.js",
 		"build:deploy": "yarn install && echo 'No build needed'"
 	},
 	"engines": {
