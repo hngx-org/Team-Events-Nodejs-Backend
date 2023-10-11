@@ -3,6 +3,7 @@ swagger: '2.0'
 info:
   title: Team Events API
   version: 1.0.0
+basePath: /api
 paths:
   /auth/google:
     get:
@@ -73,7 +74,7 @@ paths:
         - Comment
       summary: Get Comments
       description: This route is used to get comments.
-  /event:
+  /events:
     post:
       tags:
         - Event
@@ -94,7 +95,7 @@ paths:
           description: Events retrieved successfully.
         404:
           description: No events found.
-  /event/friends:
+  /events/friends:
     get:
       tags:
         - Event
@@ -105,7 +106,7 @@ paths:
           description: Friend events retrieved successfully.
         404:
           description: No friend events found.
-  /event/search:
+  /events/search:
     get:
       tags:
         - Event
@@ -121,7 +122,7 @@ paths:
           description: Events matching the search retrieved successfully.
         404:
           description: No matching events found.
-  /event/info/{eventId}:
+  /events/info/{eventId}:
     get:
       tags:
         - Event
@@ -185,13 +186,13 @@ paths:
         - Group
       summary: Get Group by ID
       description: This route is used to get a particular group by its ID.
-  /group/event/{groupId}:
+  /group/events/{groupId}:
     get:
       tags:
         - Group
       summary: Get Events in Group
       description: This route is used to get all events under a specific group.
 
-`;
+`
 
-export default swagger;
+export default swagger
