@@ -12,6 +12,11 @@ const router = (0, express_1.Router)();
  * PROTECTED ROUTE
  */
 router.post('/', multer_cloudinary_config_1.default.single('image'), event_controller_1.createEvent);
+/*@PUT /update-event/:id
+ * This route should take care of updating events should return a 201
+ * PROTECTED ROUTE
+ */
+router.put('/update-event/:id', multer_cloudinary_config_1.default.single('image'), event_controller_1.updateEvent);
 /*@GET /event
  * This route should take care of getting events created by all users
  * PROTECTED ROUTE

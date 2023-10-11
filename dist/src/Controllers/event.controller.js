@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteEvent = exports.getEventById = exports.eventSearch = exports.getFriendEvent = exports.getAllEvents = exports.createEvent = void 0;
+exports.updateEvent = exports.deleteEvent = exports.getEventById = exports.eventSearch = exports.getFriendEvent = exports.getAllEvents = exports.createEvent = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const cloudinaryConfig_1 = __importDefault(require("../config/cloudinaryConfig"));
@@ -34,6 +34,37 @@ const createEvent = async (req, res) => {
     }
 };
 exports.createEvent = createEvent;
+//update event
+const updateEvent = async (req, res) => {
+    try {
+        const { created_by, event_name, event_description, event_start, event_end, location, } = req.body;
+        const { secure_url } = await cloudinaryConfig_1.default.uploader.upload(req.file.path);
+        const updateEvent = await prisma.event.update({
+            where: {
+                id: req.params.id,
+            },
+            data: {
+                created_by,
+                event_name,
+                event_description,
+                image: secure_url,
+                event_start,
+                event_end,
+                location,
+            },
+        });
+        res.status(201).json({
+            statusCode: 201,
+            message: 'Event updated successfully',
+            data: updateEvent,
+        });
+    }
+    catch (error) {
+        console.error('Error creating event:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.updateEvent = updateEvent;
 const getAllEvents = async (req, res) => {
     // Get all events
     const events = await prisma.event.findMany();
