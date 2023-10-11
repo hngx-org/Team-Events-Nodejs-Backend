@@ -39,3 +39,7 @@ Look at prisma [docs](https://www.prisma.io/docs/concepts/components/prisma-clie
 
 ## Usage
 After looking at what your ticket create a branch checkout into that branch locate your route and controller and add the logic. After testing push to your branch and create a PR on github. 
+
+
+## API URL
+You can access the API at `https://wetindeysup-api.onrender.com/api/`
