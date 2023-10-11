@@ -35,13 +35,15 @@ const index_1 = __importDefault(require("./Routes/index"));
 const PORT = Number(process.env.PORT) || 8080;
 const YAML = __importStar(require("yaml"));
 const swagger_1 = __importDefault(require("../swagger"));
-// Parse the API documentation file.
-const swaggerDocument = YAML.parse(swagger_1.default);
 const connect_db_1 = __importDefault(require("./config/connect.db"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({ origin: '*' }));
 app.use(express_1.default.json());
+// Connect to DB
 (0, connect_db_1.default)();
+// Parse the API documentation file.
+const swaggerDocument = YAML.parse(swagger_1.default);
+// Routes
 app.use('/api', index_1.default);
 app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerDocument));
 const server = app.listen(PORT, () => {
