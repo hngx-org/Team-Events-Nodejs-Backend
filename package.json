@@ -9,6 +9,9 @@
     "build": "tsc",
     "test": "jest --watchAll --verbose"
   },
+  "engines": {
+    "node": "18.18.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.23.0",
     "@babel/preset-env": "^7.22.20",
