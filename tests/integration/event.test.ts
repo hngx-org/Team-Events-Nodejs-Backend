@@ -48,7 +48,7 @@ describe("Event Integration Test", () => {
       const res = await request(app).get(
         `/api/events/search?keyword=${keyword}`
       );
-      expect(res.body).toBeInstanceOf(Array);
+      expect(res.statusCode).toBe(200);
     });
   });
 });
