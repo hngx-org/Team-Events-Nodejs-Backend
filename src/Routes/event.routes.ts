@@ -21,7 +21,7 @@ router.post('/',upload.single('image'), createEvent)
  * This route should take care of updating events should return a 201
  * PROTECTED ROUTE
  */
-router.put('/update-event/:id',upload.single('image'), updateEvent)
+router.put('/:eventId', upload.single('image'), updateEvent)
 
 /*@GET /event
  * This route should take care of getting events created by all users
