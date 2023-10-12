@@ -58,7 +58,12 @@ const updateEvent = async (req: Request, res: Response) => {
       secure_url = uploadURL;
     }
     catch(error){
-      console.log(error);
+      const event = await prisma.event.findUnique({
+        where:{
+          id: req.params.eventId,
+        },
+      })
+      secure_url = event.image;
     }
     const updateEvent: Event = await prisma.event.update({
       where:{
