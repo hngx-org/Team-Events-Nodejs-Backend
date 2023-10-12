@@ -6,17 +6,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const multer_cloudinary_config_1 = __importDefault(require("../config/multer-cloudinary-config"));
 const event_controller_1 = require("../Controllers/event.controller");
+const auth_middleware_1 = __importDefault(require("../middleware/auth.middleware"));
 const router = (0, express_1.Router)();
 /*@POST /event
  * This route should take care of creating events should return a 201
  * PROTECTED ROUTE
  */
 router.post('/', multer_cloudinary_config_1.default.single('image'), event_controller_1.createEvent);
-/*@PUT /update-event/:id
+/*@PUT /events/:id
  * This route should take care of updating events should return a 201
  * PROTECTED ROUTE
  */
-router.put('/update-event/:id', multer_cloudinary_config_1.default.single('image'), event_controller_1.updateEvent);
+router.put('/:eventId', multer_cloudinary_config_1.default.single('image'), event_controller_1.updateEvent);
 /*@GET /event
  * This route should take care of getting events created by all users
  * PROTECTED ROUTE
@@ -26,7 +27,7 @@ router.get('/', event_controller_1.getAllEvents);
  * This route should take care of getting all events of members of shared groups
  * PROTECTED ROUTE
  */
-router.get('/friends', event_controller_1.getFriendEvent);
+router.get('/friends', auth_middleware_1.default, event_controller_1.getFriendEvent);
 /*@GET /event/search?keyword=
  * This route should take care of the searching event by name
  */

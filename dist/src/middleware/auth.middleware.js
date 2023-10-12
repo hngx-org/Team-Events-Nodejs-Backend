@@ -28,10 +28,9 @@ const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const protect = async (req, res, next) => {
     let token;
-    if (req.headers.authorization &&
-        req.headers.authorization.startsWith("Bearer")) {
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         try {
-            token = req.headers.authorization.split(" ")[1];
+            token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, process.env.SECRET_KEY);
             req.user = await prisma.user.findUnique({
                 where: {
@@ -48,16 +47,14 @@ const protect = async (req, res, next) => {
             console.error(error);
             res.status(401).json({
                 status: 401,
-                message: "There was an issue authorizing token",
-                data: null,
+                message: 'Authentication failed. Please check your token.',
             });
         }
     }
     else {
         res.status(401).json({
             status: 401,
-            message: "Unauthorized",
-            data: null,
+            message: 'Unauthorized',
         });
     }
 };

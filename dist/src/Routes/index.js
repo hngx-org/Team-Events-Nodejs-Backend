@@ -14,7 +14,7 @@ const comment_routes_1 = __importDefault(require("./comment.routes"));
  */
 router.use('/auth', auth_routes_1.default);
 router.use('/events', event_routes_1.default);
-router.use('/group', group_routes_1.default);
+router.use('/groups', group_routes_1.default);
 router.use('/comment', comment_routes_1.default);
 exports.default = router;
 //# sourceMappingURL=index.js.map

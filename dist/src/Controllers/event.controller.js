@@ -9,7 +9,7 @@ const prisma = new client_1.PrismaClient();
 const cloudinaryConfig_1 = __importDefault(require("../config/cloudinaryConfig"));
 const createEvent = async (req, res) => {
     try {
-        const { created_by, event_name, event_description, event_start, event_end, location, } = req.body;
+        const { created_by, event_name, event_description, event_start, event_end, location } = req.body;
         const { secure_url } = await cloudinaryConfig_1.default.uploader.upload(req.file.path);
         const newEvent = await prisma.event.create({
             data: {
@@ -37,11 +37,11 @@ exports.createEvent = createEvent;
 //update event
 const updateEvent = async (req, res) => {
     try {
-        const { created_by, event_name, event_description, event_start, event_end, location, } = req.body;
+        const { created_by, event_name, event_description, event_start, event_end, location } = req.body;
         const { secure_url } = await cloudinaryConfig_1.default.uploader.upload(req.file.path);
         const updateEvent = await prisma.event.update({
             where: {
-                id: req.params.id,
+                id: req.params.eventId,
             },
             data: {
                 created_by,
@@ -78,7 +78,7 @@ const getAllEvents = async (req, res) => {
 exports.getAllEvents = getAllEvents;
 const getFriendEvent = async (req, res) => {
     try {
-        const userId = '5c8e1b9f-c7f1-4578-bd6e-923832bdb903'; // Get the user ID from the request [req.user.id]
+        const userId = req.user.id;
         // Find all groups that the user belongs to
         const userGroups = await prisma.userGroup.findMany({
             where: {
