@@ -217,6 +217,27 @@ const swaggerDocument = {
 					},
 				},
 			},
+			put: {
+				tags: ['Event'],
+				summary: 'Update Event',
+				description: 'This route is used to update an event.',
+				parameters: [
+					{
+						name: 'eventId',
+						in: 'path',
+						required: true,
+						type: 'string',
+					},
+				],
+				responses: {
+					201: {
+						description: 'Event updated successfully.',
+					},
+					500: {
+						description: 'Error updating event.',
+					},
+				},
+			},
 		},
 		'/groups': {
 			post: {

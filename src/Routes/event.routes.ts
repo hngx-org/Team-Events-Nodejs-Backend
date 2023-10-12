@@ -18,7 +18,7 @@ const router = Router();
  */
 router.post('/', upload.single('image'), createEvent);
 
-/*@PUT /update-event/:id
+/*@PUT /events/:id
  * This route should take care of updating events should return a 201
  * PROTECTED ROUTE
  */
