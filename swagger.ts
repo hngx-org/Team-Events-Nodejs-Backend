@@ -2,8 +2,9 @@
 const swaggerDocument = {
 	swagger: '2.0',
 	info: {
-		title: 'Team Events API',
+		title: 'Team Events API (NodeJs)',
 		version: '1.0.0',
+		description: 'https://wetindeysup-api.onrender.com/api-docs',
 	},
 	basePath: '/api',
 	paths: {
@@ -196,27 +197,6 @@ const swaggerDocument = {
 					},
 				},
 			},
-			delete: {
-				tags: ['Event'],
-				summary: 'Delete Event',
-				description: 'This route is used to delete a particular event.',
-				parameters: [
-					{
-						name: 'eventId',
-						in: 'path',
-						required: true,
-						type: 'string',
-					},
-				],
-				responses: {
-					200: {
-						description: 'Event deleted successfully.',
-					},
-					404: {
-						description: 'Event not found.',
-					},
-				},
-			},
 			put: {
 				tags: ['Event'],
 				summary: 'Update Event',
@@ -235,6 +215,27 @@ const swaggerDocument = {
 					},
 					500: {
 						description: 'Error updating event.',
+					},
+				},
+			},
+			delete: {
+				tags: ['Event'],
+				summary: 'Delete Event',
+				description: 'This route is used to delete a particular event.',
+				parameters: [
+					{
+						name: 'eventId',
+						in: 'path',
+						required: true,
+						type: 'string',
+					},
+				],
+				responses: {
+					200: {
+						description: 'Event deleted successfully.',
+					},
+					404: {
+						description: 'Event not found.',
 					},
 				},
 			},
