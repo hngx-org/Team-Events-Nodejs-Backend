@@ -54,8 +54,7 @@ const updateEvent = async (req: Request, res: Response) => {
     let secure_url;
     
     try{
-      const { secure_url: uploadURL } = await cloudinary.uploader.upload(req.file.path);
-      secure_url = uploadURL;
+      const { secure_url } = await cloudinary.uploader.upload(req.file.path);
     }
     catch(error){
       const event = await prisma.event.findUnique({
@@ -64,6 +63,7 @@ const updateEvent = async (req: Request, res: Response) => {
         },
       })
       secure_url = event.image;
+      console.log(error)
     }
     const updateEvent: Event = await prisma.event.update({
       where:{
