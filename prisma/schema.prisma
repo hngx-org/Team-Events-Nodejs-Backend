@@ -54,7 +54,6 @@ model Group {
 
   group_name String
   created_by String
-
   user_groups UserGroup[]
   event_group EventGroup[]
   user        User         @relation(fields: [created_by], references: [id])
