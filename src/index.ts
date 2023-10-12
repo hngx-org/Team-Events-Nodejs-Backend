@@ -2,27 +2,27 @@ import express, { Express } from 'express'
 import cors from 'cors'
 import { config } from 'dotenv'
 import swaggerUi from 'swagger-ui-express'
-config()
 import index from './Routes/index'
-const PORT: number = Number(process.env.PORT) || 8080
-import * as YAML from 'yaml'
-import swagger from '../swagger'
+import swaggerDocument from '../swagger'
 import connectDB from './config/connect.db'
+config()
 
+// App Init
 const app: Express = express()
-app.use(cors({ origin: '*' }))
-app.use(express.json())
-
 // Connect to DB
 connectDB()
 
-// Parse the API documentation file.
-const swaggerDocument = YAML.parse(swagger)
+// Middlewares
+app.use(cors({ origin: '*' }))
+app.use(express.json())
+
+// Swagger API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 // Routes
 app.use('/api', index)
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
+const PORT: number = Number(process.env.PORT) || 8080
 const server = app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`)
 })
