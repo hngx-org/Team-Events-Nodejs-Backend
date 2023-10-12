@@ -5,7 +5,7 @@ const swaggerDocument = {
 		title: 'Team Events API',
 		version: '1.0.0',
 	},
-	basePath: 'https://wetindeysup-api.onrender.com/api',
+	basePath: '/api',
 	paths: {
 		'/auth/google': {
 			get: {
@@ -132,6 +132,15 @@ const swaggerDocument = {
 				tags: ['Event'],
 				summary: 'Get Friend Events',
 				description: 'This route is used to get all events of members of shared groups.',
+				security: [
+					{
+						BearerAuth: {
+							type: 'http',
+							scheme: 'bearer',
+							bearerFormat: 'JWT',
+						},
+					},
+				],
 				responses: {
 					200: {
 						description: 'Friend events retrieved successfully.',
@@ -215,6 +224,15 @@ const swaggerDocument = {
 				summary: 'Create Group',
 				description:
 					'This route is used to create groups (no page on the design for this, but just use the information in the table)',
+				security: [
+					{
+						BearerAuth: {
+							type: 'http',
+							scheme: 'bearer',
+							bearerFormat: 'JWT',
+						},
+					},
+				],
 				responses: {
 					201: {
 						description: 'Group created successfully.',
@@ -228,12 +246,13 @@ const swaggerDocument = {
 				tags: ['Groups'],
 				summary: 'Get User Groups',
 				description: 'This route is used to get all groups that a user is a part of.',
-				parameters: [
+				security: [
 					{
-						name: 'userId',
-						in: 'path',
-						required: true,
-						type: 'string',
+						BearerAuth: {
+							type: 'http',
+							scheme: 'bearer',
+							bearerFormat: 'JWT',
+						},
 					},
 				],
 				responses: {
@@ -261,6 +280,6 @@ const swaggerDocument = {
 			},
 		},
 	},
-}
+};
 
-export default swaggerDocument
+export default swaggerDocument;
