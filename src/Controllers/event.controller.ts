@@ -55,7 +55,7 @@ const updateEvent = async (req: Request, res: Response) => {
 
     const updateEvent: Event = await prisma.event.update({
       where:{
-        id: req.params.id,
+        id: req.params.eventId,
       },
       data: {
         created_by,
