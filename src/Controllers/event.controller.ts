@@ -57,17 +57,9 @@ const updateEvent = async (req: Request, res: Response) => {
       const { secure_url: uploadURL } = await cloudinary.uploader.upload(req.file.path);
       secure_url = uploadURL;
     }
-    catch{
-      const event = await prisma.event.findUnique({
-        where: {
-          id: req.params.eventId,
-        },
-      })
-      const { secure_url: uploadURL }= event.image;
-      secure_url = uploadURL;
+    catch(error){
+      console.log(error);
     }
-    
-
     const updateEvent: Event = await prisma.event.update({
       where:{
         id: req.params.eventId,
