@@ -30,8 +30,8 @@ router.get('/info/:groupId', getGroupById);
 router.get('/event/:groupId', getGroupEvent);
 
 /*@POST /groups/:groupId/addUser
- * This route should take care of adding a user to a group using the user email address
+ * This route should take care of adding a user to a group
  */
-router.post('/:groupId/addUser', addUserToGroup);
+router.post('/:groupId/addUser', protect, addUserToGroup);
 
 export default router;
