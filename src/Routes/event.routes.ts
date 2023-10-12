@@ -1,5 +1,5 @@
-import { Router } from 'express'
-import upload from "../config/multer-cloudinary-config"; 
+import { Router } from 'express';
+import upload from '../config/multer-cloudinary-config';
 import {
 	createEvent,
 	eventSearch,
@@ -8,46 +8,47 @@ import {
 	getFriendEvent,
 	deleteEvent,
 	updateEvent,
-} from '../Controllers/event.controller'
-const router = Router()
+} from '../Controllers/event.controller';
+import protect from '../middleware/auth.middleware';
+const router = Router();
 
 /*@POST /event
  * This route should take care of creating events should return a 201
  * PROTECTED ROUTE
  */
-router.post('/',upload.single('image'), createEvent)
+router.post('/', upload.single('image'), createEvent);
 
-/*@PUT /update-event/:id
+/*@PUT /events/:id
  * This route should take care of updating events should return a 201
  * PROTECTED ROUTE
  */
-router.put('/:eventId', upload.single('image'), updateEvent)
+router.put('/:eventId', upload.single('image'), updateEvent);
 
 /*@GET /event
  * This route should take care of getting events created by all users
  * PROTECTED ROUTE
  */
-router.get('/', getAllEvents)
+router.get('/', getAllEvents);
 
 /*@GET /event/friends
  * This route should take care of getting all events of members of shared groups
  * PROTECTED ROUTE
  */
-router.get('/friends', getFriendEvent)
+router.get('/friends', protect, getFriendEvent);
 
 /*@GET /event/search?keyword=
  * This route should take care of the searching event by name
  */
-router.get('/search', eventSearch)
+router.get('/search', eventSearch);
 
 /*@GET /event/info/eventId
  * This route should take care of getting a particular event
  */
-router.get('/info/:eventId', getEventById)
+router.get('/info/:eventId', getEventById);
 
 /*@DELETE /event/eventId
  * This route should take care of deleting a particular event
  */
-router.delete('/:eventId', deleteEvent)
+router.delete('/:eventId', deleteEvent);
 
-export default router
+export default router;
