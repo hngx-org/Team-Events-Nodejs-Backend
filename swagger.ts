@@ -265,6 +265,21 @@ const swaggerDocument = {
 				},
 			},
 		},
+		'/groups/{groupId}/addUser': {
+			post: {
+				tags: ['Groups'],
+				summary: 'Add user to group',
+				description: 'This route is used add a user to a group using the user email address.',
+				responses: {
+					201: {
+						description: 'User added successfully.',
+					},
+					500: {
+						description: 'Error adding user.',
+					},
+				},
+			},
+		},
 		'/groups/info/{groupId}': {
 			get: {
 				tags: ['Groups'],

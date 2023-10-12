@@ -38,4 +38,6 @@ const getGroupById = (req: Request, res: Response) => {};
 
 const getGroupEvent = (req: Request, res: Response) => {};
 
-export { createGroup, getGroupById, getGroupEvent, getUserGroups };
+const addUserToGroup = (req: Request, res: Response) => {};
+
+export { createGroup, getGroupById, getGroupEvent, getUserGroups, addUserToGroup };

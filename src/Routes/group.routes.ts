@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import { createGroup, getGroupById, getGroupEvent, getUserGroups } from '../Controllers/group.controller';
+import {
+	createGroup,
+	getGroupById,
+	getGroupEvent,
+	getUserGroups,
+	addUserToGroup,
+} from '../Controllers/group.controller';
 import protect from '../middleware/auth.middleware';
 const router = Router();
 
@@ -22,5 +28,10 @@ router.get('/info/:groupId', getGroupById);
  * This route should take care of getting all events under groups
  */
 router.get('/event/:groupId', getGroupEvent);
+
+/*@POST /groups/:groupId/addUser
+ * This route should take care of adding a user to a group using the user email address
+ */
+router.post('/:groupId/addUser', addUserToGroup);
 
 export default router;
