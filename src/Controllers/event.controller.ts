@@ -50,8 +50,23 @@ const updateEvent = async (req: Request, res: Response) => {
       event_end,
       location,
     } = req.body
-
-    const { secure_url } = await cloudinary.uploader.upload(req.file.path)
+    
+    let secure_url;
+    
+    try{
+      const { secure_url: uploadURL } = await cloudinary.uploader.upload(req.file.path);
+      secure_url = uploadURL;
+    }
+    catch{
+      const event = await prisma.event.findUnique({
+        where: {
+          id: req.params.eventId,
+        },
+      })
+      const { secure_url: uploadURL }= event.image;
+      secure_url = uploadURL;
+    }
+    
 
     const updateEvent: Event = await prisma.event.update({
       where:{
@@ -74,7 +89,7 @@ const updateEvent = async (req: Request, res: Response) => {
       data: updateEvent,
     })
   } catch (error) {
-    console.error('Error creating event:', error)
+    console.error('Error updating event:', error)
     res.status(500).json({ error: 'Internal server error' })
   }
 }
