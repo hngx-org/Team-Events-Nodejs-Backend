@@ -81,7 +81,38 @@ const getUserGroups = async (req: Request, res: Response) => {
 	}
 };
 
-const getGroupById = (req: Request, res: Response) => {};
+const getGroupById = async (req: Request, res: Response) => {
+	const groupId = req.params.groupId;
+
+	try {
+		const group = await prisma.group.findUnique({
+			where: {
+				id: groupId,
+			},
+			include: {
+				user_groups: {
+					select: {
+						user_id: true,
+					},
+				},
+			},
+		});
+
+		if (group) {
+			// Count the number of users/members in the group
+			const numberOfMembers = group.user_groups.length;
+			res.status(200).json({
+				statusCode: 200,
+				data: { ...group, numberOfMembers },
+			});
+		} else {
+			res.status(404).json({ error: 'Group not found' });
+		}
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: 'An error occurred while fetching the group.' });
+	}
+};
 
 const getGroupEvent = async (req: Request, res: Response) => {
 	const groupId = req.params.groupId;
