@@ -5,35 +5,39 @@ const prisma = new PrismaClient();
 
 const createGroup = async (req: Request, res: Response) => {
 	try {
+		const userId = (req.user as User).id;
+
 		const requestSchema = Joi.object({
 			group_name: Joi.string().required(),
-			created_by: Joi.string().required(),
-			emails: Joi.string(),
+			emails: Joi.array(),
 		});
 
 		const { error } = requestSchema.validate(req.body);
 		if (error) return res.status(400).json({ error: error.details[0].message });
 
-		const { group_name, created_by, emails } = req.body;
+		const { group_name, emails } = req.body;
 
 		//const { secure_url } = await await cloudinary.uploader.upload(req.file.path);
 
 		const newGroup = await prisma.group.create({
 			data: {
 				group_name,
-				created_by,
+				created_by: userId,
 			},
 		});
 
 		if (emails && emails.length > 0) {
-			for (const email of emails) {
+			const userGroupCreatePromises = emails.map(async (email: string) => {
 				await prisma.userGroup.create({
 					data: {
 						user: { connect: { email } },
 						group: { connect: { id: newGroup.id } },
 					},
 				});
-			}
+			});
+
+			// Wait for all userGroup.create promises to complete
+			await Promise.all(userGroupCreatePromises);
 		}
 
 		res.status(201).json({
@@ -79,7 +83,37 @@ const getUserGroups = async (req: Request, res: Response) => {
 
 const getGroupById = (req: Request, res: Response) => {};
 
-const getGroupEvent = (req: Request, res: Response) => {};
+const getGroupEvent = async (req: Request, res: Response) => {
+	const groupId = req.params.groupId;
+
+	try {
+		const groupEvents = await prisma.eventGroup.findMany({
+			where: {
+				group_id: groupId,
+			},
+			include: {
+				event: true,
+			},
+		});
+
+		if (groupEvents.length > 0) {
+			const eventObjects = groupEvents.map((groupEvent) => ({
+				...groupEvent.event,
+				group_id: groupEvent.group_id,
+			}));
+
+			res.status(200).json({
+				statusCode: 201,
+				data: eventObjects,
+			});
+		} else {
+			res.status(404).json({ error: 'No events found for this group' });
+		}
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: 'An error occurred while fetching group events.' });
+	}
+};
 
 const addUserToGroup = (req: Request, res: Response) => {};
 

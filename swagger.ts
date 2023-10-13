@@ -278,6 +278,14 @@ const swaggerDocument = {
 				tags: ['Groups'],
 				summary: 'Add user to group',
 				description: 'This route is used add a user to a group using the user email address.',
+				parameters: [
+					{
+						name: 'groupId',
+						in: 'path',
+						required: true,
+						type: 'string',
+					},
+				],
 				responses: {
 					201: {
 						description: 'User added successfully.',
@@ -293,6 +301,14 @@ const swaggerDocument = {
 				tags: ['Groups'],
 				summary: 'Get Group by ID',
 				description: 'This route is used to get a particular group by its ID.',
+				parameters: [
+					{
+						name: 'groupId',
+						in: 'path',
+						required: true,
+						type: 'string',
+					},
+				],
 			},
 		},
 		'/groups/events/{groupId}': {
@@ -300,6 +316,22 @@ const swaggerDocument = {
 				tags: ['Groups'],
 				summary: 'Get Events in Group',
 				description: 'This route is used to get all events under a specific group.',
+				parameters: [
+					{
+						name: 'groupId',
+						in: 'path',
+						required: true,
+						type: 'string',
+					},
+				],
+				responses: {
+					200: {
+						description: 'Events retrieved successfully.',
+					},
+					404: {
+						description: 'No events found for this group.',
+					},
+				},
 			},
 		},
 	},
