@@ -11,6 +11,6 @@ import comment from './comment.routes';
 router.use('/auth', auth);
 router.use('/events', event);
 router.use('/groups', group);
-router.use('/comment', comment);
+router.use('/comments', comment);
 
 export default router;
