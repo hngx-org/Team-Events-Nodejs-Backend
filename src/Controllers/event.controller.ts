@@ -20,6 +20,9 @@ const createEvent = async (req: Request, res: Response) => {
 
 		const { created_by, event_name, event_description, event_start, event_end, location } = req.body;
 
+		// Check if a file is uploaded
+		if (!req.file) return res.status(400).json({ error: 'image is required' });
+		// File upload (cloudinary)
 		const { secure_url } = await cloudinary.uploader.upload(req.file.path);
 
 		const newEvent: Event = await prisma.event.create({
@@ -41,20 +44,20 @@ const createEvent = async (req: Request, res: Response) => {
 		});
 	} catch (error) {
 		console.error('Error creating event:', error);
-		res.status(500).json({ error: 'Internal server error' });
+		res.status(500).json({ error: 'Error creating event' });
 	}
 };
 
-//update event
+// update event
 const updateEvent = async (req: Request, res: Response) => {
 	try {
 		const requestSchema = Joi.object({
-			created_by: Joi.string().required(),
-			event_name: Joi.string().required(),
-			event_description: Joi.string().required(),
-			event_start: Joi.date().iso().required(),
-			event_end: Joi.date().iso().required(),
-			location: Joi.string().required(),
+			created_by: Joi.string(),
+			event_name: Joi.string(),
+			event_description: Joi.string(),
+			event_start: Joi.date().iso(),
+			event_end: Joi.date().iso(),
+			location: Joi.string(),
 		});
 
 		const { error } = requestSchema.validate(req.body);
@@ -86,7 +89,7 @@ const updateEvent = async (req: Request, res: Response) => {
 		});
 	} catch (error) {
 		console.error('Error creating event:', error);
-		res.status(500).json({ error: 'Internal server error' });
+		res.status(500).json({ error: 'Error updating event' });
 	}
 };
 
@@ -230,7 +233,12 @@ const deleteEvent = async (req: Request, res: Response) => {
 	if (!event) return res.status(404).json({ message: 'Event not found' });
 	// Delete event from database
 	await prisma.event.delete({ where: { id: eventId } });
-	// TODO: Delete image from cloudinary
+	// Delete image from cloudinary
+	if (event.image) {
+		// Extract the public ID from the image URL
+		const publicId = event.image.split('/v')[1].split('/')[1];
+		await cloudinary.uploader.destroy(publicId);
+	}
 	res.status(200).json({ message: 'Event deleted successfully' });
 };
 
