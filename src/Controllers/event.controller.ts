@@ -1,12 +1,28 @@
 import { Event, PrismaClient, User } from '@prisma/client';
 import { Request, Response } from 'express';
-const prisma = new PrismaClient();
+import Joi from 'joi';
 import cloudinary from '../config/cloudinaryConfig';
+const prisma = new PrismaClient();
 
 const createEvent = async (req: Request, res: Response) => {
 	try {
+		const requestSchema = Joi.object({
+			created_by: Joi.string().required(),
+			event_name: Joi.string().required(),
+			event_description: Joi.string().required(),
+			event_start: Joi.date().iso().required(),
+			event_end: Joi.date().iso().required(),
+			location: Joi.string().required(),
+		});
+
+		const { error } = requestSchema.validate(req.body);
+		if (error) return res.status(400).json({ error: error.details[0].message });
+
 		const { created_by, event_name, event_description, event_start, event_end, location } = req.body;
 
+		// Check if a file is uploaded
+		if (!req.file) return res.status(400).json({ error: 'image is required' });
+		// File upload (cloudinary)
 		const { secure_url } = await cloudinary.uploader.upload(req.file.path);
 
 		const newEvent: Event = await prisma.event.create({
@@ -28,13 +44,25 @@ const createEvent = async (req: Request, res: Response) => {
 		});
 	} catch (error) {
 		console.error('Error creating event:', error);
-		res.status(500).json({ error: 'Internal server error' });
+		res.status(500).json({ error: 'Error creating event' });
 	}
 };
 
-//update event
+// update event
 const updateEvent = async (req: Request, res: Response) => {
 	try {
+		const requestSchema = Joi.object({
+			created_by: Joi.string(),
+			event_name: Joi.string(),
+			event_description: Joi.string(),
+			event_start: Joi.date().iso(),
+			event_end: Joi.date().iso(),
+			location: Joi.string(),
+		});
+
+		const { error } = requestSchema.validate(req.body);
+		if (error) return res.status(400).json({ error: error.details[0].message });
+
 		const { created_by, event_name, event_description, event_start, event_end, location } = req.body;
 
 		const { secure_url } = await cloudinary.uploader.upload(req.file.path);
@@ -61,7 +89,7 @@ const updateEvent = async (req: Request, res: Response) => {
 		});
 	} catch (error) {
 		console.error('Error creating event:', error);
-		res.status(500).json({ error: 'Internal server error' });
+		res.status(500).json({ error: 'Error updating event' });
 	}
 };
 
@@ -166,6 +194,13 @@ const eventSearch = async (req: Request, res: Response) => {
 };
 
 const getEventById = async (req: Request, res: Response) => {
+	const requestSchema = Joi.object({
+		eventId: Joi.string().required(),
+	});
+
+	const { error } = requestSchema.validate(req.params);
+	if (error) return res.status(400).json({ error: error.details[0].message });
+
 	const eventId: string = req.params.eventId;
 	const event = await prisma.event.findFirst({
 		where: {
@@ -187,13 +222,25 @@ const getEventById = async (req: Request, res: Response) => {
 };
 
 const deleteEvent = async (req: Request, res: Response) => {
+	const requestSchema = Joi.object({
+		eventId: Joi.string().required(),
+	});
+
+	const { error } = requestSchema.validate(req.params);
+	if (error) return res.status(400).json({ error: error.details[0].message });
+
 	const eventId = req.params.eventId;
 	const event = await prisma.event.findUnique({ where: { id: eventId } });
 	if (!event) return res.status(404).json({ message: 'Event not found' });
 	// Delete event from database
 	await prisma.event.delete({ where: { id: eventId } });
-	// TODO: Delete image from cloudinary
+	// Delete image from cloudinary
+	if (event.image) {
+		// Extract the public ID from the image URL
+		const publicId = event.image.split('/v')[1].split('/')[1];
+		await cloudinary.uploader.destroy(publicId);
+	}
 	res.status(200).json({ message: 'Event deleted successfully' });
 };
 
-export { createEvent, getAllEvents, getFriendEvent, eventSearch, getEventById, deleteEvent, updateEvent };
+export { createEvent, deleteEvent, eventSearch, getAllEvents, getEventById, getFriendEvent, updateEvent };

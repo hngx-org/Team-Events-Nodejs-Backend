@@ -2,10 +2,24 @@
 const swaggerDocument = {
 	swagger: '2.0',
 	info: {
-		title: 'Team Events API',
+		title: 'Team Events API (NodeJs)',
 		version: '1.0.0',
+		description: 'https://wetindeysup-api.onrender.com/api-docs',
 	},
 	basePath: '/api',
+	schemes: ['http'],
+	securityDefinitions: {
+		BearerAuth: {
+			type: 'apiKey',
+			name: 'Authorization',
+			in: 'header',
+		},
+	},
+	security: [
+		{
+			BearerAuth: [] as any[],
+		},
+	],
 	paths: {
 		'/auth/google': {
 			get: {
@@ -132,15 +146,6 @@ const swaggerDocument = {
 				tags: ['Event'],
 				summary: 'Get Friend Events',
 				description: 'This route is used to get all events of members of shared groups.',
-				security: [
-					{
-						BearerAuth: {
-							type: 'http',
-							scheme: 'bearer',
-							bearerFormat: 'JWT',
-						},
-					},
-				],
 				responses: {
 					200: {
 						description: 'Friend events retrieved successfully.',
@@ -196,27 +201,6 @@ const swaggerDocument = {
 					},
 				},
 			},
-			delete: {
-				tags: ['Event'],
-				summary: 'Delete Event',
-				description: 'This route is used to delete a particular event.',
-				parameters: [
-					{
-						name: 'eventId',
-						in: 'path',
-						required: true,
-						type: 'string',
-					},
-				],
-				responses: {
-					200: {
-						description: 'Event deleted successfully.',
-					},
-					404: {
-						description: 'Event not found.',
-					},
-				},
-			},
 			put: {
 				tags: ['Event'],
 				summary: 'Update Event',
@@ -238,6 +222,27 @@ const swaggerDocument = {
 					},
 				},
 			},
+			delete: {
+				tags: ['Event'],
+				summary: 'Delete Event',
+				description: 'This route is used to delete a particular event.',
+				parameters: [
+					{
+						name: 'eventId',
+						in: 'path',
+						required: true,
+						type: 'string',
+					},
+				],
+				responses: {
+					200: {
+						description: 'Event deleted successfully.',
+					},
+					404: {
+						description: 'Event not found.',
+					},
+				},
+			},
 		},
 		'/groups': {
 			post: {
@@ -245,15 +250,6 @@ const swaggerDocument = {
 				summary: 'Create Group',
 				description:
 					'This route is used to create groups (no page on the design for this, but just use the information in the table)',
-				security: [
-					{
-						BearerAuth: {
-							type: 'http',
-							scheme: 'bearer',
-							bearerFormat: 'JWT',
-						},
-					},
-				],
 				responses: {
 					201: {
 						description: 'Group created successfully.',
@@ -267,15 +263,6 @@ const swaggerDocument = {
 				tags: ['Groups'],
 				summary: 'Get User Groups',
 				description: 'This route is used to get all groups that a user is a part of.',
-				security: [
-					{
-						BearerAuth: {
-							type: 'http',
-							scheme: 'bearer',
-							bearerFormat: 'JWT',
-						},
-					},
-				],
 				responses: {
 					200: {
 						description: 'User group fetched successfully.',

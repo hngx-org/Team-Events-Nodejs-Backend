@@ -1,9 +1,53 @@
 import { PrismaClient, User } from '@prisma/client';
 import { Request, Response } from 'express';
+import Joi from 'joi';
 const prisma = new PrismaClient();
 
 
-const createGroup = (req: Request, res: Response) => {};
+const createGroup = async (req: Request, res: Response) => {
+	try {
+		const requestSchema = Joi.object({
+			group_name: Joi.string().required(),
+			created_by: Joi.string().required(),
+			emails: Joi.string(),
+		});
+
+		const { error } = requestSchema.validate(req.body);
+		if (error) return res.status(400).json({ error: error.details[0].message });
+
+		const { group_name, created_by, emails } = req.body;
+
+		//const { secure_url } = await await cloudinary.uploader.upload(req.file.path);
+
+		const newGroup = await prisma.group.create({
+			data: {
+				group_name,
+				created_by,
+			},
+		});
+
+		if (emails && emails.length > 0) {
+			for (const email of emails) {
+				await prisma.userGroup.create({
+					data: {
+						user: { connect: { email } },
+						group: { connect: { id: newGroup.id } },
+					},
+				});
+			}
+		}
+
+		res.status(201).json({
+			statusCode: 201,
+			message: 'Group created successfully',
+			data: newGroup,
+		});
+	} catch (error) {
+		console.error('Error creating group:', error);
+		res.status(500).json({ error: 'An error occurred when creating the group' });
+	}
+};
+
 
 const getUserGroups = async (req: Request, res: Response) => {
 	try {
@@ -90,4 +134,4 @@ const addUserToGroup = async (req: Request, res: Response) => {
 	}
 };
 
-export { createGroup, getGroupById, getGroupEvent, getUserGroups, addUserToGroup };
+export { addUserToGroup, createGroup, getGroupById, getGroupEvent, getUserGroups };
