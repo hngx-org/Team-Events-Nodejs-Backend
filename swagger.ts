@@ -4,7 +4,7 @@ const swaggerDocument = {
 	info: {
 		title: 'Team Events API (NodeJs)',
 		version: '1.0.0',
-		description: 'https://wetindeysup-api.onrender.com/api',
+		description: 'https://wetindeysup-api.onrender.com',
 	},
 	components: {
 		securitySchemes: {
@@ -81,18 +81,18 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/api/auth/logout': {
-			post: {
-				tags: ['Auth'],
-				summary: 'Logout',
-				description: 'This route is used to log out the user.',
-				responses: {
-					302: {
-						description: 'Redirects to the homepage after logging out.',
-					},
-				},
-			},
-		},
+		// '/api/auth/logout': {
+		// 	post: {
+		// 		tags: ['Auth'],
+		// 		summary: 'Logout',
+		// 		description: 'This route is used to log out the user.',
+		// 		responses: {
+		// 			302: {
+		// 				description: 'Redirects to the homepage after logging out.',
+		// 			},
+		// 		},
+		// 	},
+		// },
 
 		'/api/events': {
 			post: {
@@ -133,6 +133,21 @@ const swaggerDocument = {
 					},
 					404: {
 						description: 'No friend events found.',
+					},
+				},
+			},
+		},
+		'/api/events/calendar': {
+			get: {
+				tags: ['Event'],
+				summary: 'Get All Events (calendar)',
+				description: 'This route is used to get all events',
+				responses: {
+					200: {
+						description: 'Events retrieved successfully.',
+					},
+					404: {
+						description: 'No events found.',
 					},
 				},
 			},
