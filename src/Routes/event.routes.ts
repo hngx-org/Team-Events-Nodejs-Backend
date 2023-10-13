@@ -16,13 +16,13 @@ const router = Router();
  * This route should take care of creating events should return a 201
  * PROTECTED ROUTE
  */
-router.post('/', upload.single('image'), createEvent);
+router.post('/', upload.single('image'), protect, createEvent);
 
 /*@PUT /events/:id
  * This route should take care of updating events should return a 201
  * PROTECTED ROUTE
  */
-router.put('/:eventId', upload.single('image'), updateEvent);
+router.put('/:eventId', upload.single('image'), protect, updateEvent);
 
 /*@GET /event
  * This route should take care of getting events created by all users

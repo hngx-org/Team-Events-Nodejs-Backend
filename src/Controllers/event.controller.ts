@@ -6,36 +6,49 @@ const prisma = new PrismaClient();
 
 const createEvent = async (req: Request, res: Response) => {
 	try {
+		const userId = (req.user as User).id;
+
 		const requestSchema = Joi.object({
-			created_by: Joi.string().required(),
 			event_name: Joi.string().required(),
 			event_description: Joi.string().required(),
 			event_start: Joi.date().iso().required(),
 			event_end: Joi.date().iso().required(),
 			location: Joi.string().required(),
+			groupId: Joi.string(),
 		});
 
 		const { error } = requestSchema.validate(req.body);
 		if (error) return res.status(400).json({ error: error.details[0].message });
 
-		const { created_by, event_name, event_description, event_start, event_end, location } = req.body;
+		const { event_name, event_description, event_start, event_end, location, groupId } = req.body;
 
 		// Check if a file is uploaded
-		if (!req.file) return res.status(400).json({ error: 'image is required' });
+		if (!req.file) return res.status(400).json({ error: 'Image is required' });
+
 		// File upload (cloudinary)
 		const { secure_url } = await cloudinary.uploader.upload(req.file.path);
 
-		const newEvent: Event = await prisma.event.create({
+		const newEvent = await prisma.event.create({
 			data: {
-				created_by,
 				event_name,
 				event_description,
 				image: secure_url,
 				event_start,
 				event_end,
 				location,
+				created_by: userId,
 			},
 		});
+
+		// Associate the event with a group
+		if (groupId) {
+			await prisma.eventGroup.create({
+				data: {
+					event: { connect: { id: newEvent.id } },
+					group: { connect: { id: groupId } },
+				},
+			});
+		}
 
 		res.status(201).json({
 			statusCode: 201,
@@ -52,7 +65,6 @@ const createEvent = async (req: Request, res: Response) => {
 const updateEvent = async (req: Request, res: Response) => {
 	try {
 		const requestSchema = Joi.object({
-			created_by: Joi.string(),
 			event_name: Joi.string(),
 			event_description: Joi.string(),
 			event_start: Joi.date().iso(),
@@ -63,7 +75,7 @@ const updateEvent = async (req: Request, res: Response) => {
 		const { error } = requestSchema.validate(req.body);
 		if (error) return res.status(400).json({ error: error.details[0].message });
 
-		const { created_by, event_name, event_description, event_start, event_end, location } = req.body;
+		const { event_name, event_description, event_start, event_end, location } = req.body;
 
 		const { secure_url } = await cloudinary.uploader.upload(req.file.path);
 
@@ -72,7 +84,6 @@ const updateEvent = async (req: Request, res: Response) => {
 				id: req.params.eventId,
 			},
 			data: {
-				created_by,
 				event_name,
 				event_description,
 				image: secure_url,
