@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import Joi from 'joi';
 const prisma = new PrismaClient();
 
+
 const createGroup = async (req: Request, res: Response) => {
 	try {
 		const userId = (req.user as User).id;
@@ -50,6 +51,7 @@ const createGroup = async (req: Request, res: Response) => {
 		res.status(500).json({ error: 'An error occurred when creating the group' });
 	}
 };
+
 
 const getUserGroups = async (req: Request, res: Response) => {
 	try {
@@ -115,6 +117,55 @@ const getGroupEvent = async (req: Request, res: Response) => {
 	}
 };
 
-const addUserToGroup = (req: Request, res: Response) => {};
+const addUserToGroup = async (req: Request, res: Response) => {
+	try {
+		if (!req.body.email || typeof req.body.email !== "string"){
+			return res.status(400).json({
+				error: "Missing email field",
+				message: "Field must contain a valid email",
+				statusCode: 400
+			})
+		}
+		type groupVar = { id: string; }
+		const user = await prisma.user.findFirst({where:{
+			email: req.body.email
+		}})
+		if (!user){
+			return res.status(404).json({
+				error: "User does not exist",
+				message: "This user does not exist",
+				statusCode: 404
+		})}
+		const group: groupVar = await prisma.group.findUnique({
+			where:{
+				id: req.params.groupId
+			}
+		});
+		if (!group) {
+			return res.status(404).json({
+			error: "Resource not found",
+			statusCode: 404,
+			message: "group does not exist"
+		})
+	}
+		await prisma.userGroup.create({
+			data:{
+				user_id: user.id,
+				group_id: req.params.groupId
+
+			}
+		})
+		return res.status(200).json({
+			message: "User added to group successfully",
+			statusCode: 200
+		})
+
+	} catch(err){
+		return res.status(500).json({
+			message: "something went wrong",
+			error: err.message
+		})
+	}
+};
 
 export { addUserToGroup, createGroup, getGroupById, getGroupEvent, getUserGroups };

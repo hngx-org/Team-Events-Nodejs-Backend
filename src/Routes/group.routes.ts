@@ -30,6 +30,7 @@ router.get('/info/:groupId', getGroupById);
  */
 router.get('/events/:groupId', getGroupEvent);
 
+
 /*@POST /groupss/:groupId/addUser
  * This route should take care of adding a user to a group using the user email address
  */
