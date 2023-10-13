@@ -4,8 +4,8 @@ config();
 
 const clientId = process.env['GOOGLE_CLIENT_ID'];
 const clientSecret = process.env['GOOGLE_CLIENT_SECRET'];
-const redirectUri = 'http://localhost:8080/api/auth/callback';
-// const redirectUri = 'https://wetindeysup-api.onrender.com/api/auth/callback'
+const redirectUri = 'https://wetindeysup-api.onrender.com/api/auth/callback';
+// const redirectUri = 'http://localhost:8080/api/auth/callback';
 
 const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
 

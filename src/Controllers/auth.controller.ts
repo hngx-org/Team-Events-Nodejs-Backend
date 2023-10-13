@@ -77,32 +77,31 @@ const callback = async (req: Request, res: Response) => {
 };
 
 const twitterAuth = (req: Request, res: Response) => {
-	//start the twitter authentication flow
-	passport.authenticate('twitter')(req, res);
+	// start the twitter authentication flow
+	passport.authenticate('twitter');
 };
 
-//controller function to handle the twitter callback
+// controller function to handle the twitter callback
 const twitterAuthCallback = (req: Request, res: Response) => {
-	//handle twitter callback
 	passport.authenticate('twitter', (err: any, user: any) => {
 		if (err) {
-			//handle authentication errors
+			// Handle authentication errors
 			return res.status(500).json({ error: 'Authentication error' });
 		}
 		if (!user) {
-			//authentication failed
+			// Authentication failed
 			return res.status(401).json({ error: 'Authentication failed' });
 		}
 
-		//authentication succeeded
+		// Authentication succeeded
 		const accessToken = generateToken(user.id);
 		res.status(200).json({ user, accessToken });
 	})(req, res);
 };
 
 const logout = (req: Request, res: Response) => {
-	// (req as any).logout(); // logout the user
-	res.redirect('/'); // redirects to the homepage
+	// req.logout();
+	res.status(200).json({});
 };
 
 export { googleAuth, twitterAuth, logout, callback, twitterAuthCallback };
