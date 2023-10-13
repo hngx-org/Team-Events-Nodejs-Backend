@@ -9,6 +9,19 @@ const swaggerDocument = {
         description: 'https://wetindeysup-api.onrender.com/api-docs',
     },
     basePath: '/api',
+    schemes: ['http'],
+    securityDefinitions: {
+        BearerAuth: {
+            type: 'apiKey',
+            name: 'Authorization',
+            in: 'header',
+        },
+    },
+    security: [
+        {
+            BearerAuth: [],
+        },
+    ],
     paths: {
         '/auth/google': {
             get: {
@@ -135,15 +148,6 @@ const swaggerDocument = {
                 tags: ['Event'],
                 summary: 'Get Friend Events',
                 description: 'This route is used to get all events of members of shared groups.',
-                security: [
-                    {
-                        BearerAuth: {
-                            type: 'http',
-                            scheme: 'bearer',
-                            bearerFormat: 'JWT',
-                        },
-                    },
-                ],
                 responses: {
                     200: {
                         description: 'Friend events retrieved successfully.',
@@ -247,15 +251,6 @@ const swaggerDocument = {
                 tags: ['Groups'],
                 summary: 'Create Group',
                 description: 'This route is used to create groups (no page on the design for this, but just use the information in the table)',
-                security: [
-                    {
-                        BearerAuth: {
-                            type: 'http',
-                            scheme: 'bearer',
-                            bearerFormat: 'JWT',
-                        },
-                    },
-                ],
                 responses: {
                     201: {
                         description: 'Group created successfully.',
@@ -269,15 +264,6 @@ const swaggerDocument = {
                 tags: ['Groups'],
                 summary: 'Get User Groups',
                 description: 'This route is used to get all groups that a user is a part of.',
-                security: [
-                    {
-                        BearerAuth: {
-                            type: 'http',
-                            scheme: 'bearer',
-                            bearerFormat: 'JWT',
-                        },
-                    },
-                ],
                 responses: {
                     200: {
                         description: 'User group fetched successfully.',
@@ -293,6 +279,14 @@ const swaggerDocument = {
                 tags: ['Groups'],
                 summary: 'Add user to group',
                 description: 'This route is used add a user to a group using the user email address.',
+                parameters: [
+                    {
+                        name: 'groupId',
+                        in: 'path',
+                        required: true,
+                        type: 'string',
+                    },
+                ],
                 responses: {
                     201: {
                         description: 'User added successfully.',
@@ -308,6 +302,14 @@ const swaggerDocument = {
                 tags: ['Groups'],
                 summary: 'Get Group by ID',
                 description: 'This route is used to get a particular group by its ID.',
+                parameters: [
+                    {
+                        name: 'groupId',
+                        in: 'path',
+                        required: true,
+                        type: 'string',
+                    },
+                ],
             },
         },
         '/groups/events/{groupId}': {
@@ -315,6 +317,22 @@ const swaggerDocument = {
                 tags: ['Groups'],
                 summary: 'Get Events in Group',
                 description: 'This route is used to get all events under a specific group.',
+                parameters: [
+                    {
+                        name: 'groupId',
+                        in: 'path',
+                        required: true,
+                        type: 'string',
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: 'Events retrieved successfully.',
+                    },
+                    404: {
+                        description: 'No events found for this group.',
+                    },
+                },
             },
         },
     },

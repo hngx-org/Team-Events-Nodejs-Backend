@@ -12,12 +12,12 @@ const router = (0, express_1.Router)();
  * This route should take care of creating events should return a 201
  * PROTECTED ROUTE
  */
-router.post('/', multer_cloudinary_config_1.default.single('image'), event_controller_1.createEvent);
+router.post('/', multer_cloudinary_config_1.default.single('image'), auth_middleware_1.default, event_controller_1.createEvent);
 /*@PUT /events/:id
  * This route should take care of updating events should return a 201
  * PROTECTED ROUTE
  */
-router.put('/:eventId', multer_cloudinary_config_1.default.single('image'), event_controller_1.updateEvent);
+router.put('/:eventId', multer_cloudinary_config_1.default.single('image'), auth_middleware_1.default, event_controller_1.updateEvent);
 /*@GET /event
  * This route should take care of getting events created by all users
  * PROTECTED ROUTE
