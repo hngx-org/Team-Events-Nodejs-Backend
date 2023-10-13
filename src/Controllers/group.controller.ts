@@ -97,9 +97,14 @@ const getGroupEvent = async (req: Request, res: Response) => {
 		});
 
 		if (groupEvents.length > 0) {
+			const eventObjects = groupEvents.map((groupEvent) => ({
+				...groupEvent.event,
+				group_id: groupEvent.group_id,
+			}));
+
 			res.status(200).json({
 				statusCode: 201,
-				data: groupEvents,
+				data: eventObjects,
 			});
 		} else {
 			res.status(404).json({ error: 'No events found for this group' });
