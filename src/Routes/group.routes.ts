@@ -7,12 +7,13 @@ import {
 	addUserToGroup,
 } from '../Controllers/group.controller';
 import protect from '../middleware/auth.middleware';
+import upload from '../config/multer-cloudinary-config';
 const router = Router();
 
 /*@POST /group
  * This route should take care of creating groups(no page on the design for this but just use the information in the table)
  */
-router.post('/', createGroup);
+router.post('/',upload.single('image'), createGroup);
 
 /*@GET /group
  * This route should take care of getting all groups user is in
