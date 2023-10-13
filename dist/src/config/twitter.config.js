@@ -12,10 +12,11 @@ const twitterConsumerKey = process.env.TWITTER_CONSUMER_KEY;
 exports.twitterConsumerKey = twitterConsumerKey;
 const twitterConsumerSecret = process.env.TWITTER_CONSUMER_SECRET;
 exports.twitterConsumerSecret = twitterConsumerSecret;
-const twitterAccessTokenKey = process.env.ACCESS_TOKEN_KEY;
-const twitterAccessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+// const twitterAccessTokenKey = process.env.ACCESS_TOKEN_KEY;
+// const twitterAccessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
 const twitterCallbackUrl = 'https://wetindeysup-api.onrender.com/api/auth/twitter/callback';
 exports.twitterCallbackUrl = twitterCallbackUrl;
+// const twitterCallbackUrl = 'http://localhost:8080/api/auth/twitter/callback';
 const passport_1 = __importDefault(require("passport"));
 const passport_twitter_1 = require("passport-twitter");
 passport_1.default.use(new passport_twitter_1.Strategy({
@@ -27,13 +28,13 @@ passport_1.default.use(new passport_twitter_1.Strategy({
     userProfileURL: 'https://api.twitter.com/1.1/account/verify_credentials.json?include_entities=true&include_email=true',
     includeEmail: true,
     includeEntities: true,
-    passReqToCallback: false
+    passReqToCallback: false,
 }, (req, twitterAccessTokenSecret, profile, done) => {
     prisma.user
         .findFirst({
         where: {
-            auth_id: profile.id
-        }
+            auth_id: profile.id,
+        },
     })
         .then((user) => {
         if (user) {
@@ -48,7 +49,7 @@ passport_1.default.use(new passport_twitter_1.Strategy({
                     auth_method: 'twitter',
                     auth_id: profile.id,
                     username: profile.username,
-                    email: profile.emails[0].value
+                    email: profile.emails[0].value,
                 },
             })
                 .then((newUser) => {

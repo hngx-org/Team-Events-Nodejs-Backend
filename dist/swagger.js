@@ -35,7 +35,7 @@ const swaggerDocument = {
                 },
             },
         },
-        '/api/auth/google/callback': {
+        '/api/auth/callback': {
             get: {
                 tags: ['Auth'],
                 summary: 'Google OAuth Callback',
@@ -53,48 +53,48 @@ const swaggerDocument = {
                 },
             },
         },
-        '/api/auth/twitter': {
-            post: {
-                tags: ['Auth'],
-                summary: 'Authenticate with Twitter',
-                description: 'This route is used to initiate Twitter authentication.',
-                responses: {
-                    302: {
-                        description: 'Redirects to Twitter for authentication.',
-                    },
-                },
-            },
-        },
-        '/api/auth/twitter/callback': {
-            post: {
-                tags: ['Auth'],
-                summary: 'Twitter Authentication Callback',
-                description: 'This route handles the callback after Twitter authentication.',
-                responses: {
-                    200: {
-                        description: 'User authenticated successfully.',
-                    },
-                    401: {
-                        description: 'Authentication failed.',
-                    },
-                    500: {
-                        description: 'Authentication error.',
-                    },
-                },
-            },
-        },
-        // '/api/auth/logout': {
+        // '/api/auth/twitter': {
         // 	post: {
         // 		tags: ['Auth'],
-        // 		summary: 'Logout',
-        // 		description: 'This route is used to log out the user.',
+        // 		summary: 'Authenticate with Twitter',
+        // 		description: 'This route is used to initiate Twitter authentication.',
         // 		responses: {
         // 			302: {
-        // 				description: 'Redirects to the homepage after logging out.',
+        // 				description: 'Redirects to Twitter for authentication.',
         // 			},
         // 		},
         // 	},
         // },
+        // '/api/auth/twitter/callback': {
+        // 	post: {
+        // 		tags: ['Auth'],
+        // 		summary: 'Twitter Authentication Callback',
+        // 		description: 'This route handles the callback after Twitter authentication.',
+        // 		responses: {
+        // 			200: {
+        // 				description: 'User authenticated successfully.',
+        // 			},
+        // 			401: {
+        // 				description: 'Authentication failed.',
+        // 			},
+        // 			500: {
+        // 				description: 'Authentication error.',
+        // 			},
+        // 		},
+        // 	},
+        // },
+        '/api/auth/logout': {
+            post: {
+                tags: ['Auth'],
+                summary: 'Logout',
+                description: 'This route is used to log out the user.',
+                responses: {
+                    302: {
+                        description: 'Redirects to the homepage after logging out.',
+                    },
+                },
+            },
+        },
         '/api/events': {
             post: {
                 tags: ['Event'],
