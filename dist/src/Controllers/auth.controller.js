@@ -31,29 +31,37 @@ const callback = async (req, res) => {
                     auth_method: 'google',
                     auth_id: data.id,
                     email: data.email ? data.email : null,
+                    username: data.name,
+                    avatar: data.picture,
                 },
             });
-            //generate accessToken
+            // generate accessToken
             const token = (0, utils_1.generateToken)(newUser.id);
-            //return token
+            // return token
             res.status(201).json({
                 statusCode: 201,
-                message: 'User created',
+                message: 'User created successfully',
                 data: {
                     id: newUser.id,
+                    email: newUser.email,
+                    username: newUser.username,
+                    avatar: newUser.avatar,
                     token,
                 },
             });
         }
         else {
-            //generate access token
+            // generate access token
             const token = (0, utils_1.generateToken)(userExists.id);
-            //return token
+            // return token
             res.status(200).json({
                 statusCode: 200,
-                message: 'User login successful',
+                message: 'User login successfully',
                 data: {
                     id: userExists.id,
+                    email: userExists.email,
+                    username: userExists.username,
+                    avatar: userExists.avatar,
                     token,
                 },
             });
