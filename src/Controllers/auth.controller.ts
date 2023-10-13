@@ -101,8 +101,8 @@ const twitterAuthCallback = (req: Request, res: Response) => {
 };
 
 const logout = (req: Request, res: Response) => {
-	(req as any).logout(); //logout the user
-	res.redirect('/'); //redirects to the homepage
+	// (req as any).logout(); // logout the user
+	res.redirect('/'); // redirects to the homepage
 };
 
 export { googleAuth, twitterAuth, logout, callback, twitterAuthCallback };
