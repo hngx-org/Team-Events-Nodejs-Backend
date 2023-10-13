@@ -81,18 +81,18 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/api/auth/logout': {
-			post: {
-				tags: ['Auth'],
-				summary: 'Logout',
-				description: 'This route is used to log out the user.',
-				responses: {
-					302: {
-						description: 'Redirects to the homepage after logging out.',
-					},
-				},
-			},
-		},
+		// '/api/auth/logout': {
+		// 	post: {
+		// 		tags: ['Auth'],
+		// 		summary: 'Logout',
+		// 		description: 'This route is used to log out the user.',
+		// 		responses: {
+		// 			302: {
+		// 				description: 'Redirects to the homepage after logging out.',
+		// 			},
+		// 		},
+		// 	},
+		// },
 
 		'/api/events': {
 			post: {
