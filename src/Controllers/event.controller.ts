@@ -114,6 +114,16 @@ const getAllEvents = async (req: Request, res: Response) => {
 	}
 };
 
+const getEventsCalendar = async (req: Request, res: Response) => {
+	// Get all events
+	const events = await prisma.event.findMany();
+	if (events.length > 0) {
+		res.status(200).json(events);
+	} else {
+		res.status(404).json({ error: 'No events found' });
+	}
+};
+
 const getFriendEvent = async (req: Request, res: Response) => {
 	try {
 		const userId = (req.user as User).id;
@@ -162,7 +172,7 @@ const eventSearch = async (req: Request, res: Response) => {
 		});
 	}
 	let keyWord: string = req.query.keyword;
-	
+
 	try {
 		const searchResults = await prisma.event.findMany({
 			where: {
@@ -254,4 +264,13 @@ const deleteEvent = async (req: Request, res: Response) => {
 	res.status(200).json({ message: 'Event deleted successfully' });
 };
 
-export { createEvent, deleteEvent, eventSearch, getAllEvents, getEventById, getFriendEvent, updateEvent };
+export {
+	createEvent,
+	deleteEvent,
+	eventSearch,
+	getAllEvents,
+	getEventById,
+	getFriendEvent,
+	updateEvent,
+	getEventsCalendar,
+};
