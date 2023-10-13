@@ -77,7 +77,38 @@ const getUserGroups = async (req, res) => {
     }
 };
 exports.getUserGroups = getUserGroups;
-const getGroupById = (req, res) => { };
+const getGroupById = async (req, res) => {
+    const groupId = req.params.groupId;
+    try {
+        const group = await prisma.group.findUnique({
+            where: {
+                id: groupId,
+            },
+            include: {
+                user_groups: {
+                    select: {
+                        user_id: true,
+                    },
+                },
+            },
+        });
+        if (group) {
+            // Count the number of users/members in the group
+            const numberOfMembers = group.user_groups.length;
+            res.status(200).json({
+                statusCode: 200,
+                data: { ...group, numberOfMembers },
+            });
+        }
+        else {
+            res.status(404).json({ error: 'Group not found' });
+        }
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while fetching the group.' });
+    }
+};
 exports.getGroupById = getGroupById;
 const getGroupEvent = async (req, res) => {
     const groupId = req.params.groupId;
@@ -112,51 +143,52 @@ const getGroupEvent = async (req, res) => {
 exports.getGroupEvent = getGroupEvent;
 const addUserToGroup = async (req, res) => {
     try {
-        if (!req.body.email || typeof req.body.email !== "string") {
-            return res.status(400).json({
-                error: "Missing email field",
-                message: "Field must contain a valid email",
-                statusCode: 400
-            });
-        }
-        const user = await prisma.user.findFirst({ where: {
-                email: req.body.email
-            } });
-        if (!user) {
-            return res.status(404).json({
-                error: "User does not exist",
-                message: "This user does not exist",
-                statusCode: 404
-            });
-        }
+        const schema = joi_1.default.object({
+            email: joi_1.default.string().email().required(),
+        });
+        const { error } = schema.validate(req.body);
+        if (error)
+            return res.status(400).json({ error: error.details[0].message });
+        // Check if the user exists
+        const user = await prisma.user.findFirst({
+            where: {
+                email: req.body.email,
+            },
+        });
+        if (!user)
+            return res.status(404).json({ error: 'User not found' });
+        // Check if the group exists
         const group = await prisma.group.findUnique({
             where: {
-                id: req.params.groupId
-            }
+                id: req.params.groupId,
+            },
         });
-        if (!group) {
-            return res.status(404).json({
-                error: "Resource not found",
-                statusCode: 404,
-                message: "group does not exist"
-            });
-        }
+        if (!group)
+            return res.status(404).json({ error: 'Group not found' });
+        // Check if the user is already in the group
+        const existingUserGroup = await prisma.userGroup.findFirst({
+            where: {
+                user_id: user.id,
+                group_id: req.params.groupId,
+            },
+        });
+        if (existingUserGroup)
+            return res.status(400).json({ error: 'User is already a member of the group' });
+        // If the user is not already in the group, add them
         await prisma.userGroup.create({
             data: {
                 user_id: user.id,
-                group_id: req.params.groupId
-            }
+                group_id: req.params.groupId,
+            },
         });
         return res.status(200).json({
-            message: "User added to group successfully",
-            statusCode: 200
+            message: 'User added to the group successfully',
+            statusCode: 200,
         });
     }
     catch (err) {
-        return res.status(500).json({
-            message: "something went wrong",
-            error: err.message
-        });
+        console.error(err);
+        res.status(500).json({ error: 'Error adding user to group' });
     }
 };
 exports.addUserToGroup = addUserToGroup;

@@ -24,7 +24,7 @@ router.get('/info/:groupId', group_controller_1.getGroupById);
  * This route should take care of getting all events under a group
  */
 router.get('/events/:groupId', group_controller_1.getGroupEvent);
-/*@POST /groupss/:groupId/addUser
+/*@POST /groups/:groupId/addUser
  * This route should take care of adding a user to a group using the user email address
  */
 router.post('/:groupId/addUser', auth_middleware_1.default, group_controller_1.addUserToGroup);

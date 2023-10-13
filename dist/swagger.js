@@ -9,7 +9,7 @@ const swaggerDocument = {
         description: 'https://wetindeysup-api.onrender.com/api-docs',
     },
     basePath: '/api',
-    schemes: ['http'],
+    // schemes: ['http'],
     securityDefinitions: {
         BearerAuth: {
             type: 'apiKey',
@@ -181,7 +181,7 @@ const swaggerDocument = {
                 },
             },
         },
-        '/events/{eventId}': {
+        '/events/info/{eventId}': {
             get: {
                 tags: ['Event'],
                 summary: 'Get Event by ID',
@@ -203,6 +203,8 @@ const swaggerDocument = {
                     },
                 },
             },
+        },
+        '/events/{eventId}': {
             put: {
                 tags: ['Event'],
                 summary: 'Update Event',
@@ -310,6 +312,14 @@ const swaggerDocument = {
                         type: 'string',
                     },
                 ],
+                responses: {
+                    200: {
+                        description: 'Group retrieved successfully.',
+                    },
+                    404: {
+                        description: 'Group not found.',
+                    },
+                },
             },
         },
         '/groups/events/{groupId}': {
