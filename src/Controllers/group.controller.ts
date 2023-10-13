@@ -41,14 +41,12 @@ const getGroupEvent = (req: Request, res: Response) => {};
 
 const addUserToGroup = async (req: Request, res: Response) => {
 	try {
-		type groupVar = { id: string; user_id: string; group_id: string; }
-		
-		const group: groupVar = await prisma.userGroup.findUnique({
+		type groupVar = { id: string; }
+		const group: groupVar = await prisma.group.findUnique({
 			where:{
 				id: req.params.groupId
 			}
 		});
-
 		if (!group) {
 			return res.status(404).json({
 			error: "Resource not found",
@@ -69,7 +67,7 @@ const addUserToGroup = async (req: Request, res: Response) => {
 		})
 
 	} catch(err){
-		res.status(500).json({
+		return res.status(500).json({
 			message: "something went wrong",
 			error: err.message
 		})

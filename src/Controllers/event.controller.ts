@@ -122,7 +122,9 @@ const eventSearch = async (req: Request, res: Response) => {
 			statusCode: 400,
 		});
 	}
-	const keyWord: string = req.query.keyword;
+	let keyWord: string = req.query.keyword;
+	keyWord = keyWord.replace(/""/g, '');
+	keyWord = keyWord.replace(/""/g, '');
 	try {
 		const searchResults = await prisma.event.findMany({
 			where: {
