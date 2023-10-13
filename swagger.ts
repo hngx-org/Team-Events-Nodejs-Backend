@@ -1,27 +1,27 @@
 // Define the Swagger document in JavaScript format
 const swaggerDocument = {
-	swagger: '2.0',
+	openapi: '3.0.0',
 	info: {
 		title: 'Team Events API (NodeJs)',
 		version: '1.0.0',
-		description: 'https://wetindeysup-api.onrender.com/api-docs',
+		description: 'https://wetindeysup-api.onrender.com/api',
 	},
-	basePath: '/api',
-	// schemes: ['http'],
-	securityDefinitions: {
-		BearerAuth: {
-			type: 'apiKey',
-			name: 'Authorization',
-			in: 'header',
+	components: {
+		securitySchemes: {
+			bearerAuth: {
+				type: 'http',
+				scheme: 'bearer',
+				bearerFormat: 'JWT',
+			},
 		},
 	},
 	security: [
 		{
-			BearerAuth: [] as any[],
+			bearerAuth: [] as any,
 		},
 	],
 	paths: {
-		'/auth/google': {
+		'/api/auth/google': {
 			get: {
 				tags: ['Auth'],
 				summary: 'Authenticate with Google',
@@ -33,7 +33,7 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/auth/google/callback': {
+		'/api/auth/google/callback': {
 			get: {
 				tags: ['Auth'],
 				summary: 'Google OAuth Callback',
@@ -51,7 +51,7 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/auth/twitter': {
+		'/api/auth/twitter': {
 			post: {
 				tags: ['Auth'],
 				summary: 'Authenticate with Twitter',
@@ -63,7 +63,7 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/auth/twitter/callback': {
+		'/api/auth/twitter/callback': {
 			post: {
 				tags: ['Auth'],
 				summary: 'Twitter Authentication Callback',
@@ -81,7 +81,7 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/auth/logout': {
+		'/api/auth/logout': {
 			post: {
 				tags: ['Auth'],
 				summary: 'Logout',
@@ -93,27 +93,8 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/comment': {
-			post: {
-				tags: ['Comment'],
-				summary: 'Create Comment',
-				description: 'This route is used to create a comment.',
-				responses: {
-					201: {
-						description: 'Comment created successfully.',
-					},
-					500: {
-						description: 'Comment creation error.',
-					},
-				},
-			},
-			get: {
-				tags: ['Comment'],
-				summary: 'Get Comments',
-				description: 'This route is used to get comments.',
-			},
-		},
-		'/events': {
+
+		'/api/events': {
 			post: {
 				tags: ['Event'],
 				summary: 'Create Event',
@@ -141,7 +122,7 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/events/friends': {
+		'/api/events/friends': {
 			get: {
 				tags: ['Event'],
 				summary: 'Get Friend Events',
@@ -156,7 +137,7 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/events/search': {
+		'/api/events/search': {
 			get: {
 				tags: ['Event'],
 				summary: 'Search Events',
@@ -179,7 +160,7 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/events/info/{eventId}': {
+		'/api/events/info/{eventId}': {
 			get: {
 				tags: ['Event'],
 				summary: 'Get Event by ID',
@@ -202,7 +183,7 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/events/{eventId}': {
+		'/api/events/{eventId}': {
 			put: {
 				tags: ['Event'],
 				summary: 'Update Event',
@@ -246,7 +227,71 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/groups': {
+
+		'/api/comments/{eventId}': {
+			post: {
+				tags: ['Comment'],
+				summary: 'Create Comment',
+				description: 'This route is used to create a comment.',
+				parameters: [
+					{
+						name: 'eventId',
+						in: 'path',
+						required: true,
+						type: 'string',
+					},
+				],
+				requestBody: {
+					required: true,
+					content: {
+						'application/json': {
+							schema: {
+								type: 'object',
+								properties: {
+									comment: {
+										type: 'string',
+									},
+								},
+							},
+							example: {
+								comment: 'Nice. I will be there.',
+							},
+						},
+					},
+				},
+				responses: {
+					201: {
+						description: 'Comment created successfully.',
+					},
+					500: {
+						description: 'Error creating comment.',
+					},
+				},
+			},
+			get: {
+				tags: ['Comment'],
+				summary: 'Get Comments',
+				description: 'This route is used to get comments.',
+				parameters: [
+					{
+						name: 'eventId',
+						in: 'path',
+						required: true,
+						type: 'string',
+					},
+				],
+				responses: {
+					201: {
+						description: 'Comments retrieved successfully.',
+					},
+					404: {
+						description: 'No comments found for this event.',
+					},
+				},
+			},
+		},
+
+		'/api/groups': {
 			post: {
 				tags: ['Groups'],
 				summary: 'Create Group',
@@ -275,7 +320,7 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/groups/{groupId}/addUser': {
+		'/api/groups/{groupId}/addUser': {
 			post: {
 				tags: ['Groups'],
 				summary: 'Add user to group',
@@ -298,7 +343,7 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/groups/info/{groupId}': {
+		'/api/groups/info/{groupId}': {
 			get: {
 				tags: ['Groups'],
 				summary: 'Get Group by ID',
@@ -321,7 +366,7 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/groups/events/{groupId}': {
+		'/api/groups/events/{groupId}': {
 			get: {
 				tags: ['Groups'],
 				summary: 'Get Events in Group',
