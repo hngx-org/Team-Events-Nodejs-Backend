@@ -79,7 +79,32 @@ const getUserGroups = async (req: Request, res: Response) => {
 
 const getGroupById = (req: Request, res: Response) => {};
 
-const getGroupEvent = (req: Request, res: Response) => {};
+const getGroupEvent = async (req: Request, res: Response) => {
+	const groupId = req.params.groupId;
+
+	try {
+		const groupEvents = await prisma.eventGroup.findMany({
+			where: {
+				group_id: groupId,
+			},
+			include: {
+				event: true,
+			},
+		});
+
+		if (groupEvents.length > 0) {
+			res.status(200).json({
+				statusCode: 201,
+				data: groupEvents,
+			});
+		} else {
+			res.status(404).json({ error: 'No events found for this group' });
+		}
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: 'An error occurred while fetching group events.' });
+	}
+};
 
 const addUserToGroup = (req: Request, res: Response) => {};
 
