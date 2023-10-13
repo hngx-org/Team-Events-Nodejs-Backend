@@ -101,8 +101,8 @@ const twitterAuthCallback = (req, res) => {
 };
 exports.twitterAuthCallback = twitterAuthCallback;
 const logout = (req, res) => {
-    req.logout(); //logout the user
-    res.redirect('/'); //redirects to the homepage
+    // (req as any).logout(); // logout the user
+    res.redirect('/'); // redirects to the homepage
 };
 exports.logout = logout;
 //# sourceMappingURL=auth.controller.js.map

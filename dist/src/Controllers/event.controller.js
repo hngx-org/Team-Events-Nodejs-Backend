@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateEvent = exports.getFriendEvent = exports.getEventById = exports.getAllEvents = exports.eventSearch = exports.deleteEvent = exports.createEvent = void 0;
+exports.getEventsCalendar = exports.updateEvent = exports.getFriendEvent = exports.getEventById = exports.getAllEvents = exports.eventSearch = exports.deleteEvent = exports.createEvent = void 0;
 const client_1 = require("@prisma/client");
 const joi_1 = __importDefault(require("joi"));
 const cloudinaryConfig_1 = __importDefault(require("../config/cloudinaryConfig"));
@@ -111,6 +111,17 @@ const getAllEvents = async (req, res) => {
     }
 };
 exports.getAllEvents = getAllEvents;
+const getEventsCalendar = async (req, res) => {
+    // Get all events
+    const events = await prisma.event.findMany();
+    if (events.length > 0) {
+        res.status(200).json(events);
+    }
+    else {
+        res.status(404).json({ error: 'No events found' });
+    }
+};
+exports.getEventsCalendar = getEventsCalendar;
 const getFriendEvent = async (req, res) => {
     try {
         const userId = req.user.id;
