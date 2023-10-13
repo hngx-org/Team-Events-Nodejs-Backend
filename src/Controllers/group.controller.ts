@@ -41,7 +41,23 @@ const getGroupEvent = (req: Request, res: Response) => {};
 
 const addUserToGroup = async (req: Request, res: Response) => {
 	try {
+		if (!req.body.email || typeof req.body.email !== "string"){
+			return res.status(400).json({
+				error: "Missing email field",
+				message: "Field must contain a valid email",
+				statusCode: 400
+			})
+		}
 		type groupVar = { id: string; }
+		const user = await prisma.user.findFirst({where:{
+			email: req.body.email
+		}})
+		if (!user){
+			return res.status(404).json({
+				error: "User does not exist",
+				message: "This user does not exist",
+				statusCode: 404
+		})}
 		const group: groupVar = await prisma.group.findUnique({
 			where:{
 				id: req.params.groupId
@@ -56,7 +72,7 @@ const addUserToGroup = async (req: Request, res: Response) => {
 	}
 		await prisma.userGroup.create({
 			data:{
-				user_id: req.user.id,
+				user_id: user.id,
 				group_id: req.params.groupId
 
 			}
