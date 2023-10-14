@@ -14,7 +14,8 @@ const googleAuth = (req, res) => {
 };
 exports.googleAuth = googleAuth;
 const callback = async (req, res) => {
-    const code = req.query.code;
+    // const code = req.query.code as string;
+    const { code } = req.body;
     try {
         const { tokens } = await google_config_1.oauth2Client.getToken(code);
         google_config_1.oauth2Client.setCredentials(tokens);
@@ -69,7 +70,7 @@ const callback = async (req, res) => {
     }
     catch (error) {
         console.error('Authentication error:', error);
-        res.status(500).send('Authentication error');
+        res.status(500).send('Invalid credentials');
     }
     finally {
         // Close the Prisma client at the end of the function
