@@ -12,7 +12,7 @@ const router = Router();
  * This route should take care of login and signup
  */
 router.get('/google', googleAuth);
-router.get('/callback', callback);
+router.post('/callback', callback);
 
 /*@Post /auth/twitter
  *This route should take care of login and signup
