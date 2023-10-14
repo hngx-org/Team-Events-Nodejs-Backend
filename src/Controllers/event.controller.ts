@@ -15,6 +15,7 @@ const createEvent = async (req: Request, res: Response) => {
 			event_end: Joi.date().iso().required(),
 			location: Joi.string().required(),
 			groupId: Joi.string(),
+			image: Joi.any()
 		});
 
 		const { error } = requestSchema.validate(req.body);
