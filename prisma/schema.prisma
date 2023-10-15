@@ -15,7 +15,7 @@ model User {
 
   auth_method       Auth
   auth_id           String?
-  email             String?  @unique
+  email             String? @unique
   username          String?
   avatar            String?
   google_auth_token String?
@@ -52,8 +52,9 @@ model Event {
 model Group {
   id String @id @default(uuid())
 
-  group_name String
-  created_by String
+  group_name  String
+  image       String
+  created_by  String
   user_groups UserGroup[]
   event_group EventGroup[]
   user        User         @relation(fields: [created_by], references: [id])
