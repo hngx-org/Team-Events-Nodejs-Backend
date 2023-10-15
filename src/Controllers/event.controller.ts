@@ -20,19 +20,19 @@ const createEvent = async (req: Request, res: Response) => {
 		const { error } = requestSchema.validate(req.body);
 		if (error) return res.status(400).json({ error: error.details[0].message });
 
+		let uploadedImage = 'null';
+		if (req.file) {
+			// File upload (cloudinary)
+			const { secure_url } = await cloudinary.uploader.upload(req.file.path);
+			uploadedImage = secure_url;
+		}
+
 		const { event_name, event_description, event_start, event_end, location, groupId } = req.body;
-
-		// Check if a file is uploaded
-		if (!req.file) return res.status(400).json({ error: 'Image is required' });
-
-		// File upload (cloudinary)
-		const { secure_url } = await cloudinary.uploader.upload(req.file.path);
-
 		const newEvent = await prisma.event.create({
 			data: {
 				event_name,
 				event_description,
-				image: secure_url,
+				image: uploadedImage,
 				event_start,
 				event_end,
 				location,
@@ -42,12 +42,21 @@ const createEvent = async (req: Request, res: Response) => {
 
 		// Associate the event with a group
 		if (groupId) {
-			await prisma.eventGroup.create({
-				data: {
-					event: { connect: { id: newEvent.id } },
-					group: { connect: { id: groupId } },
-				},
+			const group = await prisma.group.findUnique({
+				where: { id: groupId },
 			});
+
+			if (group) {
+				await prisma.eventGroup.create({
+					data: {
+						event: { connect: { id: newEvent.id } },
+						group: { connect: { id: groupId } },
+					},
+				});
+			} else {
+				// If the specified group doesn't exist, you may want to handle this case
+				return res.status(404).json({ error: 'Group not found' });
+			}
 		}
 
 		res.status(201).json({
