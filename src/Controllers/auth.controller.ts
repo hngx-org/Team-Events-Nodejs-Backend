@@ -11,8 +11,8 @@ const googleAuth = (req: Request, res: Response) => {
 };
 
 const callback = async (req: Request, res: Response) => {
-	// const code = req.query.code as string;
-	const { code } = req.body;
+	const code = req.query.code as string;
+	// console.log('Authorization Code:', code);
 
 	try {
 		const { tokens } = await oauth2Client.getToken(code);
@@ -43,13 +43,13 @@ const callback = async (req: Request, res: Response) => {
 			// return token
 			res.status(201).json({
 				statusCode: 201,
-				message: 'User created successfully',
-				data: {
+				message: 'Account created successfully',
+				token,
+				user: {
 					id: newUser.id,
 					email: newUser.email,
 					username: newUser.username,
 					avatar: newUser.avatar,
-					token,
 				},
 			});
 		} else {
@@ -58,13 +58,13 @@ const callback = async (req: Request, res: Response) => {
 			// return token
 			res.status(200).json({
 				statusCode: 200,
-				message: 'User login successfully',
-				data: {
+				message: 'Login successful',
+				token,
+				user: {
 					id: userExists.id,
 					email: userExists.email,
 					username: userExists.username,
 					avatar: userExists.avatar,
-					token,
 				},
 			});
 		}
