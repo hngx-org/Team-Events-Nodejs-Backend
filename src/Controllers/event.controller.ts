@@ -20,7 +20,7 @@ const createEvent = async (req: Request, res: Response) => {
 		const { error } = requestSchema.validate(req.body);
 		if (error) return res.status(400).json({ error: error.details[0].message });
 
-		let uploadedImage = 'null';
+		let uploadedImage = '';
 		if (req.file) {
 			// File upload (cloudinary)
 			const { secure_url } = await cloudinary.uploader.upload(req.file.path);
