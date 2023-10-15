@@ -7,7 +7,7 @@ const router = (0, express_1.Router)();
  * This route should take care of login and signup
  */
 router.get('/google', auth_controller_1.googleAuth);
-router.post('/callback', auth_controller_1.callback);
+router.get('/callback', auth_controller_1.callback);
 /*@Post /auth/twitter
  *This route should take care of login and signup
  */
