@@ -66,7 +66,11 @@ const getUserGroups = async (req: Request, res: Response) => {
 			include: {
 				user_group: {
 					include: {
-						group: true,
+						group: {
+							include: {
+								event_group: true, // Include events for each group
+							},
+						},
 					},
 				},
 			},
@@ -76,12 +80,14 @@ const getUserGroups = async (req: Request, res: Response) => {
 			return res.status(404).json({ error: 'User not found' });
 		}
 
-		const userGroups = user.user_group.map((userGroup) => userGroup.group);
-
-		res.status(200).json({
-			message: 'User groups fetched successfully',
-			userGroups,
+		const userGroups = user.user_group.map((userGroup) => {
+			const group = userGroup.group;
+			// Count the number of events for each group
+			const numEvents = group.event_group.length;
+			return { ...group, numEvents };
 		});
+
+		res.status(200).json(userGroups);
 	} catch (error) {
 		console.error('Error fetching user groups:', error);
 		res.status(500).json({ error: 'Internal server error' });
