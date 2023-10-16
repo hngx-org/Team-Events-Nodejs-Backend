@@ -26,8 +26,9 @@ model User {
   comment    Comment[]
   user_group UserGroup[]
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt()
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @updatedAt()
+  UserPreference UserPreference[]
 }
 
 model Event {
@@ -53,7 +54,7 @@ model Group {
   id String @id @default(uuid())
 
   group_name  String
-  image       String
+  image       String       @default("")
   created_by  String
   user_groups UserGroup[]
   event_group EventGroup[]
@@ -95,6 +96,23 @@ model EventGroup {
 
   group Group @relation(fields: [group_id], references: [id])
   event Event @relation(fields: [event_id], references: [id])
+}
+
+model UserPreference {
+  id String @id @default(uuid())
+
+  user_id String
+
+  event_update             Boolean?
+  Reminders                Boolean?
+  networking_opportunities Boolean?
+  email_notifications      Boolean?
+  push_notifications       Boolean?
+  allow_others_see_profile Boolean?
+  event_details            Boolean?
+  anyone_can_add_to_group  Boolean?
+
+  user User @relation(fields: [user_id], references: [id])
 }
 
 enum Auth {
