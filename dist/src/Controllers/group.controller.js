@@ -101,7 +101,13 @@ const getGroupById = async (req, res) => {
             include: {
                 user_groups: {
                     select: {
-                        user_id: true,
+                        user: {
+                            select: {
+                                username: true,
+                                email: true,
+                                avatar: true,
+                            },
+                        },
                     },
                 },
             },
@@ -109,9 +115,16 @@ const getGroupById = async (req, res) => {
         if (group) {
             // Count the number of users/members in the group
             const numberOfMembers = group.user_groups.length;
+            const members = group.user_groups.map((userGroup) => ({
+                name: userGroup.user.username,
+                email: userGroup.user.email,
+                avatar: userGroup.user.avatar,
+            }));
+            // Omit the 'user_groups' property
+            const { user_groups, ...groupData } = group;
             res.status(200).json({
                 statusCode: 200,
-                data: { ...group, numberOfMembers },
+                data: { ...groupData, members, numberOfMembers },
             });
         }
         else {
