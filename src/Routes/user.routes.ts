@@ -1,16 +1,26 @@
 import { Router } from 'express';
 import protect from '../middleware/auth.middleware';
-import { getUserPreference, updateUserPreference } from '../Controllers/user.controller';
+import { createUserPreference, getUserPreference, getUserPreferenceByUserId, updateUserPreference } from '../Controllers/user.controller';
 const router = Router();
 
-/*@GET /user/
- * This route should
+/*@GET settings/users/
+ * This route should get all user preference
  */
-router.get('/settings', protect, getUserPreference);
+router.get('/settings/users', protect, getUserPreference);
 
-/*@POST /groups
- * This route should
+/*@GET settings/users/{id}
+ * This route should get a user preference
  */
-router.post('/settings', protect, updateUserPreference);
+router.get('/settings/users/:id', protect, getUserPreferenceByUserId);
+
+/*@PUT /groups
+ * This route should update a user preference
+ */
+router.put('/settings/update', protect, updateUserPreference);
+
+/*@POST/groups
+ * This route should create a user preference
+ */
+router.post('/settings', protect, createUserPreference);
 
 export default router;
