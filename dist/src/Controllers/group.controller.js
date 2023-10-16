@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserGroups = exports.getGroupEvent = exports.getGroupById = exports.createGroup = exports.addUserToGroup = void 0;
 const client_1 = require("@prisma/client");
+const cloudinaryConfig_1 = __importDefault(require("../config/cloudinaryConfig"));
 const joi_1 = __importDefault(require("joi"));
 const prisma = new client_1.PrismaClient();
 const createGroup = async (req, res) => {
@@ -12,21 +13,28 @@ const createGroup = async (req, res) => {
         const userId = req.user.id;
         const requestSchema = joi_1.default.object({
             group_name: joi_1.default.string().required(),
-            emails: joi_1.default.array(),
+            emails: joi_1.default.any(),
         });
         const { error } = requestSchema.validate(req.body);
         if (error)
             return res.status(400).json({ error: error.details[0].message });
+        let uploadedImage = '';
+        if (req.file) {
+            // File upload (cloudinary)
+            const { secure_url } = await cloudinaryConfig_1.default.uploader.upload(req.file.path);
+            uploadedImage = secure_url;
+        }
         const { group_name, emails } = req.body;
-        //const { secure_url } = await await cloudinary.uploader.upload(req.file.path);
         const newGroup = await prisma.group.create({
             data: {
                 group_name,
                 created_by: userId,
+                image: uploadedImage,
             },
         });
-        if (emails && emails.length > 0) {
-            const userGroupCreatePromises = emails.map(async (email) => {
+        const emailArray = Array.isArray(emails) ? emails : JSON.parse(emails);
+        if (emailArray && emailArray.length > 0) {
+            const userGroupCreatePromises = emailArray.map(async (email) => {
                 await prisma.userGroup.create({
                     data: {
                         user: { connect: { email } },
@@ -57,7 +65,11 @@ const getUserGroups = async (req, res) => {
             include: {
                 user_group: {
                     include: {
-                        group: true,
+                        group: {
+                            include: {
+                                event_group: true, // Include events for each group
+                            },
+                        },
                     },
                 },
             },
@@ -65,11 +77,13 @@ const getUserGroups = async (req, res) => {
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-        const userGroups = user.user_group.map((userGroup) => userGroup.group);
-        res.status(200).json({
-            message: 'User groups fetched successfully',
-            userGroups,
+        const userGroups = user.user_group.map((userGroup) => {
+            const group = userGroup.group;
+            // Count the number of events for each group
+            const numEvents = group.event_group.length;
+            return { ...group, numEvents };
         });
+        res.status(200).json(userGroups);
     }
     catch (error) {
         console.error('Error fetching user groups:', error);
