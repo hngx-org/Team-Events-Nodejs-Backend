@@ -214,62 +214,44 @@ const forgotPassword = async (req: Request, res: Response) => {
 	try {
 		const requestSchema = Joi.object({
 			email: Joi.string().required().email(),
-			appBaseUrl: Joi.string().required(),
+			resetUrl: Joi.string(),
 		});
-
-		/*
-
-		appBaseUrl should be the url from the frontend.
-		something like http://wetin-dey-sup.vercel.app/auth/token
-
-		*/
-
 		const { error, value } = requestSchema.validate(req.body);
 		if (error) return res.status(400).json({ error: error.details[0].message });
 
-		const { email, appBaseUrl } = value;
+		const { email, resetUrl } = value;
 
 		//check if a user with this email exist
 		const user = await prisma.user.findUnique({
-			where: {
-				email: email,
-			},
+			where: { email: email },
 		});
+		if (!user) return res.status(404).json({ error: 'User not found' });
 
-		if (!user) {
-			return res.status(404).json({ error: 'User not found' });
-		}
-
+		// Generate resetToken
 		const salt = await bcrypt.genSalt(10);
 		const resetToken = await bcrypt.hash(user.id, salt);
 		const tokenExpireDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
 		// Save the reset token and expiration date in the user's record
 		await prisma.user.update({
-			where: {
-				id: user.id,
-			},
+			where: { id: user.id },
 			data: {
 				reset_password_token: resetToken,
 				reset_password_expires: tokenExpireDate,
 			},
 		});
 
-		const resetLink = `${appBaseUrl}?token=${resetToken}`;
-		const mailOptions = {
-			from: process.env.MAIL_FROM_ADDRESS,
-			to: email,
-			subject: 'Password Reset',
-			text: `Click on the following link to reset your password: ${resetLink}`,
-		};
-		await transporter.sendMail(mailOptions);
+		// Send email
+		let resetLink = resetUrl || 'https://event-tan-iota.vercel.app/auth/reset-password';
+		resetLink = `${resetLink}?token=${resetToken}`;
+		await sendPasswordResetEmail(email, resetLink);
 
 		return res.status(200).json({ message: 'Password reset email sent successfully' });
 	} catch (error) {
 		console.log(error);
 		return res
 			.status(500)
-			.json({ error: 'An error occured while trying to process forget password request!' });
+			.json({ error: 'An error occurred while trying to process forget password request!' });
 	}
 };
 
@@ -306,6 +288,22 @@ const twitterAuthCallback = (req: Request, res: Response) => {
 		res.status(200).json({ user, accessToken });
 	})(req, res);
 };
+
+// Helper function
+async function sendPasswordResetEmail(email: string, resetLink: string) {
+	const mailOptions = {
+		from: process.env.MAIL_FROM_ADDRESS,
+		to: email,
+		subject: 'Password Reset',
+		html: `<p>Click on the following link to reset your password: <a href="${resetLink}">${resetLink}</a></p>`,
+	};
+
+	try {
+		await transporter.sendMail(mailOptions);
+	} catch (error) {
+		console.error('Error sending password reset email:', error);
+	}
+}
 
 export {
 	callback,
