@@ -22,6 +22,7 @@ app.use(express_1.default.json());
 app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.default));
 // Routes
 app.use('/api', index_1.default);
+app.get('/', (req, res) => res.send({ message: 'Team Events' }));
 const PORT = Number(process.env.PORT) || 8080;
 const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
