@@ -83,6 +83,46 @@ const swaggerDocument = {
 		// 	},
 		// },
 
+		'/api/auth/forget-password': {
+			post: {
+				tags: ['Auth'],
+				summary: 'Forget password',
+				description: "This route is used to send a password reset link to the user's email address.",
+				parameters: [
+					{
+						name: 'email',
+						in: 'body',
+						required: true,
+						type: 'email',
+						description:"This is the user's email address that the link would be sent to."
+					},
+
+					{
+						name: 'appBaseUrl',
+						in: 'body',
+						required: true,
+						type: 'string',
+						description: `This is the base URL that points to where you want to verify the email on the frontend something like https://wetin-dey-sup.vercel.app/auth/verfiy-email this is crucial because that's part of the link that would be sent to the user's email
+						sending that would send this to the user's email as the link https://wetin-dey-sup.vercel.app/auth/verfiy-email?token={randomtoken}
+						`,
+					},
+				],
+				responses: {
+					200: {
+						description: "Password reset email sent successfully'",
+					},
+
+					404: {
+						description: 'User not found',
+					},
+
+					500: {
+						description: "An error occured while trying to process forget password request!'",
+					},
+				},
+			},
+		},
+
 		'/api/auth/logout': {
 			post: {
 				tags: ['Auth'],
