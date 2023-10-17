@@ -1,8 +1,11 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+import transporter from './../config/mail.config';
 import { Request, Response } from 'express';
-import { authUrl, oauth2Client, google } from '../config/google.config';
-import { generateToken } from '../utils';
+import Joi from 'joi';
 import passport from 'passport';
+import { authUrl, google, oauth2Client } from '../config/google.config';
+import { generateToken } from '../utils';
 
 const prisma = new PrismaClient();
 
@@ -93,12 +96,66 @@ const loginUser = async (req: Request, res: Response) => {
 
 // Function to handle password reset request
 const forgotPassword = async (req: Request, res: Response) => {
-	const { email } = req.body;
+	try {
+		const requestSchema = Joi.object({
+			email: Joi.string().required().email(),
+			appBaseUrl: Joi.string().required(),
+		});
 
-	// Send a reset password email
-	// const transporter = nodemailer.createTransport({});
+		/*
 
-	res.status(200).json({ message: 'Password reset email sent' });
+		appBaseUrl should be the url from the frontend.
+		something like http://wetin-dey-sup.vercel.app/auth/token
+
+		*/
+
+		const { error, value } = requestSchema.validate(req.body);
+		if (error) return res.status(400).json({ error: error.details[0].message });
+
+		const { email, appBaseUrl } = value;
+
+		//check if a user with this email exist
+		const user = await prisma.user.findUnique({
+			where: {
+				email: email,
+			},
+		});
+
+		if (!user) {
+			return res.status(404).json({ error: 'User not found' });
+		}
+
+		const salt = await bcrypt.genSalt(10);
+		const resetToken = await bcrypt.hash(user.id, salt);
+		const tokenExpireDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+		// Save the reset token and expiration date in the user's record
+		await prisma.user.update({
+			where: {
+				id: user.id,
+			},
+			data: {
+				reset_password_token: resetToken,
+				reset_password_expires: tokenExpireDate,
+			},
+		});
+
+		const resetLink = `${appBaseUrl}?token=${resetToken}`;
+		const mailOptions = {
+			from: process.env.MAIL_FROM_ADDRESS,
+			to: email,
+			subject: 'Password Reset',
+			text: `Click on the following link to reset your password: ${resetLink}`,
+		};
+		await transporter.sendMail(mailOptions);
+
+		return res.status(200).json({ message: 'Password reset email sent successfully' });
+	} catch (error) {
+		console.log(error);
+		return res
+			.status(500)
+			.json({ error: 'An error occured while trying to process forget password request!' });
+	}
 };
 
 // Function to handle password reset
@@ -136,14 +193,14 @@ const twitterAuthCallback = (req: Request, res: Response) => {
 };
 
 export {
-	googleAuth,
 	callback,
-	registerUser,
-	verifyEmail,
+	forgotPassword,
+	googleAuth,
 	loginUser,
 	logout,
-	forgotPassword,
+	registerUser,
 	resetPassword,
 	twitterAuth,
 	twitterAuthCallback,
+	verifyEmail,
 };
