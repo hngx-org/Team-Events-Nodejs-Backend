@@ -1,13 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
+import bcrypt from 'bcryptjs';
 import { authUrl, oauth2Client, google } from '../config/google.config';
-import { generateToken } from '../utils';
+import { generateToken, hashPassword, sendVerificationEmail } from '../utils';
 import passport from 'passport';
-import bcrypt from 'bcrypt';
 import Joi from 'joi';
 import { randomUUID } from 'crypto';
-import { hashPassword } from '../utils/hashPassword';
-import { sendVerificationEmail } from '../utils/sendVerificationEmail';
 
 const prisma = new PrismaClient();
 
