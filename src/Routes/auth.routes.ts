@@ -29,10 +29,10 @@ router.post('/signup', registerUser);
  */
 router.post('/login', loginUser);
 
-/* @Post /auth/signup
+/* @Post /auth/verify-email
  * Handle user registration
  */
-router.post('/verify-email', verifyEmail);
+router.get('/verify-email', verifyEmail);
 
 // Route to request a password reset
 router.post('/forgot-password', forgotPassword);

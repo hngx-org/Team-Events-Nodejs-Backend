@@ -125,6 +125,7 @@ model UserPreference {
 }
 
 enum Auth {
+  basic
   google
   twitter
 }
