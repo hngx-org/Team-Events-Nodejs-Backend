@@ -13,13 +13,22 @@ datasource db {
 model User {
   id String @id @default(uuid())
 
+  email    String  @unique
+  password String?
+  username String?
+  avatar   String?
+
   auth_method       Auth
   auth_id           String?
-  email             String? @unique
-  username          String?
-  avatar            String?
   google_auth_token String?
   x_auth_token      String?
+
+  email_verified             Boolean   @default(false)
+  email_verification_token   String?
+  email_verification_expires DateTime?
+
+  reset_password_token   String?
+  reset_password_expires DateTime?
 
   event      Event[]
   group      Group[]
@@ -54,8 +63,8 @@ model Group {
   id String @id @default(uuid())
 
   group_name  String
-  image       String       @default("")
   created_by  String
+  image       String?
   user_groups UserGroup[]
   event_group EventGroup[]
   user        User         @relation(fields: [created_by], references: [id])
