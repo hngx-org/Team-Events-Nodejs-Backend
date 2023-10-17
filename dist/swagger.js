@@ -402,6 +402,37 @@ const swaggerDocument = {
                 },
             },
         },
+        '/api/user/settings': {
+            get: {
+                tags: ['User Settings'],
+                summary: 'Get User Preferences Settings',
+                description: 'This route is used to get a particular user preferences settings',
+                responses: {
+                    200: {
+                        description: 'User preferences retrieved successfully.',
+                    },
+                    404: {
+                        description: 'User preferences not found.',
+                    },
+                    500: {
+                        description: 'An error occurred while fetching user preferences',
+                    },
+                },
+            },
+            post: {
+                tag: ['Update User Settings'],
+                summary: 'Update The User Preferences Settings',
+                description: 'This route is used to update a particular user preference',
+                responses: {
+                    200: {
+                        description: 'User preference saved successfully',
+                    },
+                    500: {
+                        description: 'An error occurred while saving user preference',
+                    },
+                },
+            },
+        },
     },
 };
 exports.default = swaggerDocument;
