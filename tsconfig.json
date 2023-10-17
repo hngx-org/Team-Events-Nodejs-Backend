@@ -2,12 +2,13 @@
 	"compilerOptions": {
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
-		"baseUrl": "src",
-		"target": "ES2020",
+		"baseUrl": "./src",
+		"target": "es2017",
 		"sourceMap": true,
-		"outDir": "dist",
+		"outDir": "./dist",
 		"noImplicitAny": true
 	},
 
-	"exclude": ["node_modules"]
+	"exclude": ["node_modules"],
+	"include": ["./src/**/*.ts"]
 }
