@@ -257,8 +257,42 @@ const forgotPassword = async (req: Request, res: Response) => {
 
 // Function to handle password reset
 const resetPassword = async (req: Request, res: Response) => {
-	const { token, password } = req.body;
-	res.status(200).json({ message: 'Password reset successfully' });
+	try {
+		const requestSchema = Joi.object({
+			resetToken: Joi.string().required(),
+			password: Joi.string().min(8).required(),
+		});
+		const { error, value } = requestSchema.validate(req.body);
+		if (error) return res.status(400).json({ error: error.details[0].message });
+
+		const { resetToken, password } = value;
+
+		// Find a user by the reset token
+		const user = await prisma.user.findFirst({
+			where: {
+				reset_password_token: resetToken,
+				reset_password_expires: { gte: new Date() },
+			},
+		});
+
+		if (!user) return res.status(400).json({ error: 'Invalid or expired reset token' });
+
+		// Hash the new password and update the user's password
+		const hashedPassword = await bcrypt.hash(password, 10);
+		await prisma.user.update({
+			where: { id: user.id },
+			data: {
+				password: hashedPassword,
+				reset_password_token: null,
+				reset_password_expires: null,
+			},
+		});
+
+		return res.status(200).json({ message: 'Password reset successful' });
+	} catch (error) {
+		console.error('Error resetting password:', error);
+		return res.status(500).json({ error: 'An error occurred while resetting the password' });
+	}
 };
 
 const logout = (req: Request, res: Response) => {
