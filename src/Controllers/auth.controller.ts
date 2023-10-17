@@ -123,7 +123,7 @@ const registerUser = async (req: Request, res: Response) => {
 		// Send an email with the email verification link
 		sendVerificationEmail(user.email, user.email_verification_token);
 
-		res.status(201).json({ message: 'User registered successfully.' });
+		res.status(201).json({ message: 'Sign up successful. A verification link has been sent to your email.' });
 	} catch (error) {
 		console.error('Error registering user:', error);
 		res.status(500).json({ error: 'An error occurred during registration' });
