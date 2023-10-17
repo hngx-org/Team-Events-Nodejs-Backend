@@ -83,38 +83,130 @@ const swaggerDocument = {
         // 		},
         // 	},
         // },
-        '/api/auth/forget-password': {
+        '/api/auth/signup': {
             post: {
                 tags: ['Auth'],
-                summary: 'Forget password',
-                description: "This route is used to send a password reset link to the user's email address.",
+                summary: 'Handle user registration',
+                description: 'Register a new user.',
+                requestBody: {
+                    content: {
+                        'application/json': {
+                            example: {
+                                name: 'test user',
+                                email: 'testuser1@example.com',
+                                password: 'mysecretpassword',
+                            },
+                        },
+                    },
+                    required: true,
+                },
+                responses: {
+                    '200': {
+                        description: 'Sign up successful. A verification link has been sent to your email.',
+                    },
+                    '400': {
+                        description: 'Registration failed.',
+                    },
+                },
+            },
+        },
+        '/api/auth/login': {
+            post: {
+                tags: ['Auth'],
+                summary: 'Handle user login',
+                description: 'Log in an existing user.',
+                requestBody: {
+                    content: {
+                        'application/json': {
+                            example: {
+                                email: 'user@example.com',
+                                password: 'mysecretpassword',
+                            },
+                        },
+                    },
+                    required: true,
+                },
+                responses: {
+                    '200': {
+                        description: 'User logged in successfully.',
+                    },
+                    '400': {
+                        description: 'Login failed.',
+                    },
+                },
+            },
+        },
+        '/api/auth/verify-email': {
+            get: {
+                tags: ['Auth'],
+                summary: 'Handle email verification after user registration',
+                description: 'The link sent to the user email which verify the email.',
                 parameters: [
                     {
-                        name: 'email',
-                        in: 'body',
-                        required: true,
-                        type: 'email',
-                        description: "This is the user's email address that the link would be sent to."
-                    },
-                    {
-                        name: 'appBaseUrl',
-                        in: 'body',
+                        name: 'token',
+                        in: 'query',
                         required: true,
                         type: 'string',
-                        description: `This is the base URL that points to where you want to verify the email on the frontend something like https://wetin-dey-sup.vercel.app/auth/verfiy-email this is crucial because that's part of the link that would be sent to the user's email
-						sending that would send this to the user's email as the link https://wetin-dey-sup.vercel.app/auth/verfiy-email?token={randomtoken}
-						`,
                     },
                 ],
                 responses: {
-                    200: {
-                        description: "Password reset email sent successfully'",
+                    '200': {
+                        description: 'Redirects to the frontend with query; email_verified=true. e.g., http://localhost:3000/dashboard/?email_verified=true',
                     },
-                    404: {
-                        description: 'User not found',
+                    '400': {
+                        description: 'Redirects to the frontend with query; email_verified=false. e.g., http://localhost:3000/dashboard/?email_verified=false',
                     },
-                    500: {
-                        description: "An error occured while trying to process forget password request!'",
+                },
+            },
+        },
+        '/api/auth/forgot-password': {
+            post: {
+                tags: ['Auth'],
+                summary: 'Request a password reset',
+                description: 'Request a password reset for the user.',
+                requestBody: {
+                    content: {
+                        'application/json': {
+                            example: {
+                                email: 'user@example.com',
+                                resetUrl: 'https: //example.com/reset',
+                            },
+                        },
+                    },
+                    required: true,
+                },
+                responses: {
+                    '200': {
+                        description: 'Password reset email sent successfully.',
+                    },
+                    '400': {
+                        description: 'Password reset request failed.',
+                    },
+                },
+            },
+        },
+        '/api/auth/reset-password': {
+            post: {
+                tags: ['Auth'],
+                summary: 'Handle the password reset',
+                description: "Reset the user's password.",
+                requestBody: {
+                    content: {
+                        'application/json': {
+                            example: {
+                                resetToken: 'your-reset-token',
+                                password: 'yournewpassword',
+                            },
+                        },
+                    },
+                    required: true,
+                },
+                responses: {
+                    '200': {
+                        description: 'Password reset successful.',
+                    },
+                    '400': {
+                        description: 'Password reset failed.',
                     },
                 },
             },
