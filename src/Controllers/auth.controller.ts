@@ -131,7 +131,40 @@ const registerUser = async (req: Request, res: Response) => {
 	}
 };
 
-const verifyEmail = async (req: Request, res: Response) => {};
+const verifyEmail = async (req: Request, res: Response) => {
+	try {
+		const redirectURL: string = 'http://localhost:3000/dashboard/?email_verified=';
+		const { token } = req.query;
+		const user = await prisma.user.findFirst({
+			where: {
+				email_verification_token: token as string,
+				email_verification_expires: {
+					gte: new Date(),
+				},
+			},
+		});
+
+		// Check if the token is valid
+		if (!user) {
+			return res.redirect(redirectURL + "false&error='Invalid or expired token'");
+		}
+
+		// Mark the user's email as verified
+		await prisma.user.update({
+			where: { id: user.id },
+			data: {
+				email_verified: true,
+				email_verification_token: null,
+				email_verification_expires: null,
+			},
+		});
+
+		res.redirect(redirectURL + 'true&message=Email verified successfully');
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: 'An error occurred during email verification' });
+	}
+};
 
 const loginUser = async (req: Request, res: Response) => {
 	try {
