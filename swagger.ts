@@ -83,6 +83,88 @@ const swaggerDocument = {
 		// 	},
 		// },
 
+		'/api/auth/signup': {
+			post: {
+				tags: ['Auth'],
+				summary: 'Signup',
+				description: 'This route is used to signup',
+				paramaters: [
+					{
+						name: 'Email',
+						in: 'body',
+						required: true,
+						type: 'email',
+						description: "This is the user's email address",
+					},
+
+					{
+						name: 'Password',
+						in: 'body',
+						required: true,
+						type: 'string',
+						description: "This is the user's password",
+					},
+				],
+
+				responses: {
+					201: {
+						description: 'User registered successfully.',
+					},
+
+					409: {
+						description: 'Email is already in use',
+					},
+
+					400: {
+						description: "Bad request, please check that you're sending the right data",
+					},
+
+					500: {
+						description: 'An error occurred during registration',
+					},
+				},
+			},
+		},
+
+		'/api/auth/login': {
+			post: {
+				tags: ['Auth'],
+				summary: 'Login',
+				description: 'This route is used to login',
+				paramaters: [
+					{
+						name: 'Email',
+						in: 'body',
+						required: true,
+						type: 'email',
+						description: "This is the user's email address",
+					},
+
+					{
+						name: 'Password',
+						in: 'body',
+						required: true,
+						type: 'string',
+						description: "This is the user's password",
+					},
+				],
+
+				responses: {
+					200: {
+						description: 'Login successful.',
+					},
+
+					401: {
+						description: 'Invalid email or password',
+					},
+
+					500: {
+						description: 'An error occurred while logging in',
+					},
+				},
+			},
+		},
+
 		'/api/auth/forget-password': {
 			post: {
 				tags: ['Auth'],
@@ -94,7 +176,7 @@ const swaggerDocument = {
 						in: 'body',
 						required: true,
 						type: 'email',
-						description:"This is the user's email address that the link would be sent to."
+						description: "This is the user's email address that the link would be sent to.",
 					},
 
 					{
