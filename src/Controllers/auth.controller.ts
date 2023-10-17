@@ -1,18 +1,22 @@
 import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
-import { authUrl, oauth2Client, google } from '../config/google.config';
-import { generateToken } from '../utils';
+import bcrypt from 'bcryptjs';
+import transporter from './../config/mail.config';
+import Joi from 'joi';
 import passport from 'passport';
+import { authUrl, google, oauth2Client } from '../config/google.config';
+import { generateToken, hashPassword, sendVerificationEmail } from '../utils';
+import { randomUUID } from 'crypto';
 
 const prisma = new PrismaClient();
 
+// Google Authentication
 const googleAuth = (req: Request, res: Response) => {
 	res.redirect(authUrl);
 };
 
 const callback = async (req: Request, res: Response) => {
 	const code = req.query.code as string;
-	// console.log('Authorization Code:', code);
 
 	try {
 		const { tokens } = await oauth2Client.getToken(code);
@@ -77,12 +81,215 @@ const callback = async (req: Request, res: Response) => {
 	}
 };
 
+// Basic Authentication
+const registerUser = async (req: Request, res: Response) => {
+	try {
+		const schema = Joi.object({
+			email: Joi.string().email().required(),
+			password: Joi.string().min(8).required(),
+			name: Joi.string(),
+		});
+
+		const { error, value } = schema.validate(req.body);
+		if (error) return res.status(400).json({ error: error.details[0].message });
+
+		const { email, password, name } = value;
+		// Check if the email is already in use
+		const existingUser = await prisma.user.findUnique({
+			where: { email },
+		});
+		if (existingUser) return res.status(409).json({ error: 'Email is already in use' });
+
+		// Generate an email verification token
+		const emailVerificationToken = randomUUID();
+		const expirationTime = new Date();
+		expirationTime.setHours(expirationTime.getHours() + 24);
+
+		// Hash the password
+		const hashedPassword = await hashPassword(password);
+
+		// Create a new user with the email verification data
+		const user = await prisma.user.create({
+			data: {
+				auth_method: 'basic',
+				email,
+				username: name,
+				password: hashedPassword,
+				email_verification_token: emailVerificationToken,
+				email_verification_expires: expirationTime,
+			},
+		});
+
+		// Send an email with the email verification link
+		sendVerificationEmail(user.email, user.email_verification_token);
+
+		res.status(201).json({ message: 'User registered successfully.' });
+	} catch (error) {
+		console.error('Error registering user:', error);
+		res.status(500).json({ error: 'An error occurred during registration' });
+	}
+};
+
+const verifyEmail = async (req: Request, res: Response) => {
+	try {
+		const redirectURL: string = 'http://localhost:3000/dashboard/?email_verified=';
+		const { token } = req.query;
+		const user = await prisma.user.findFirst({
+			where: {
+				email_verification_token: token as string,
+				email_verification_expires: {
+					gte: new Date(),
+				},
+			},
+		});
+
+		// Check if the token is valid
+		if (!user) {
+			return res.redirect(redirectURL + "false&error='Invalid or expired token'");
+		}
+
+		// Mark the user's email as verified
+		await prisma.user.update({
+			where: { id: user.id },
+			data: {
+				email_verified: true,
+				email_verification_token: null,
+				email_verification_expires: null,
+			},
+		});
+
+		res.redirect(redirectURL + 'true&message=Email verified successfully');
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: 'An error occurred during email verification' });
+	}
+};
+
+const loginUser = async (req: Request, res: Response) => {
+	try {
+		const schema = Joi.object({
+			email: Joi.string().email().required(),
+			password: Joi.string().min(8).required(),
+		});
+
+		const { error, value } = schema.validate(req.body);
+		if (error) return res.status(400).json({ error: error.details[0].message });
+
+		const { email, password } = req.body;
+		const user = await prisma.user.findUnique({
+			where: { email },
+		});
+		// Check if the user with the given email exists
+		if (!user) {
+			return res.status(401).json({ error: 'Invalid email or password.' });
+		}
+
+		// Verify the password
+		const passwordMatch = await bcrypt.compare(password, user.password); // Compare the hashed password
+		if (!passwordMatch) {
+			return res.status(401).json({ error: 'Invalid email or password.' });
+		}
+
+		const token: string = generateToken(user.id);
+		// return token
+		res.status(200).json({
+			statusCode: 200,
+			message: 'Login successful',
+			token,
+			user: {
+				id: user.id,
+				email: user.email,
+				username: user.username,
+				avatar: user.avatar,
+			},
+		});
+	} catch (error) {
+		console.error('Error logging in:', error);
+		res.status(500).json({ error: 'An error occurred while logging in.' });
+	}
+};
+
+// Function to handle password reset request
+const forgotPassword = async (req: Request, res: Response) => {
+	try {
+		const requestSchema = Joi.object({
+			email: Joi.string().required().email(),
+			appBaseUrl: Joi.string().required(),
+		});
+
+		/*
+
+		appBaseUrl should be the url from the frontend.
+		something like http://wetin-dey-sup.vercel.app/auth/token
+
+		*/
+
+		const { error, value } = requestSchema.validate(req.body);
+		if (error) return res.status(400).json({ error: error.details[0].message });
+
+		const { email, appBaseUrl } = value;
+
+		//check if a user with this email exist
+		const user = await prisma.user.findUnique({
+			where: {
+				email: email,
+			},
+		});
+
+		if (!user) {
+			return res.status(404).json({ error: 'User not found' });
+		}
+
+		const salt = await bcrypt.genSalt(10);
+		const resetToken = await bcrypt.hash(user.id, salt);
+		const tokenExpireDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+		// Save the reset token and expiration date in the user's record
+		await prisma.user.update({
+			where: {
+				id: user.id,
+			},
+			data: {
+				reset_password_token: resetToken,
+				reset_password_expires: tokenExpireDate,
+			},
+		});
+
+		const resetLink = `${appBaseUrl}?token=${resetToken}`;
+		const mailOptions = {
+			from: process.env.MAIL_FROM_ADDRESS,
+			to: email,
+			subject: 'Password Reset',
+			text: `Click on the following link to reset your password: ${resetLink}`,
+		};
+		await transporter.sendMail(mailOptions);
+
+		return res.status(200).json({ message: 'Password reset email sent successfully' });
+	} catch (error) {
+		console.log(error);
+		return res
+			.status(500)
+			.json({ error: 'An error occured while trying to process forget password request!' });
+	}
+};
+
+// Function to handle password reset
+const resetPassword = async (req: Request, res: Response) => {
+	const { token, password } = req.body;
+	res.status(200).json({ message: 'Password reset successfully' });
+};
+
+const logout = (req: Request, res: Response) => {
+	// req.logout();
+	res.status(200).json({});
+};
+
+// Twitter Authentication
 const twitterAuth = (req: Request, res: Response) => {
 	// start the twitter authentication flow
 	passport.authenticate('twitter');
 };
 
-// controller function to handle the twitter callback
 const twitterAuthCallback = (req: Request, res: Response) => {
 	passport.authenticate('twitter', (err: any, user: any) => {
 		if (err) {
@@ -100,9 +307,15 @@ const twitterAuthCallback = (req: Request, res: Response) => {
 	})(req, res);
 };
 
-const logout = (req: Request, res: Response) => {
-	// req.logout();
-	res.status(200).json({});
+export {
+	callback,
+	forgotPassword,
+	googleAuth,
+	loginUser,
+	logout,
+	registerUser,
+	resetPassword,
+	twitterAuth,
+	twitterAuthCallback,
+	verifyEmail,
 };
-
-export { googleAuth, twitterAuth, logout, callback, twitterAuthCallback };
