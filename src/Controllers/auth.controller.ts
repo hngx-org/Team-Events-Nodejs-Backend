@@ -6,13 +6,13 @@ import passport from 'passport';
 
 const prisma = new PrismaClient();
 
+// Google Authentication
 const googleAuth = (req: Request, res: Response) => {
 	res.redirect(authUrl);
 };
 
 const callback = async (req: Request, res: Response) => {
 	const code = req.query.code as string;
-	// console.log('Authorization Code:', code);
 
 	try {
 		const { tokens } = await oauth2Client.getToken(code);
@@ -77,12 +77,47 @@ const callback = async (req: Request, res: Response) => {
 	}
 };
 
+// Basic Authentication
+const registerUser = async (req: Request, res: Response) => {
+	// const { email, password } = req.body;
+};
+
+const verifyEmail = (req: Request, res: Response) => {
+	// req.logout();
+	res.status(200).json({});
+};
+
+const loginUser = async (req: Request, res: Response) => {
+	// const { email, password } = req.body;
+};
+
+// Function to handle password reset request
+const forgotPassword = async (req: Request, res: Response) => {
+	const { email } = req.body;
+
+	// Send a reset password email
+	// const transporter = nodemailer.createTransport({});
+
+	res.status(200).json({ message: 'Password reset email sent' });
+};
+
+// Function to handle password reset
+const resetPassword = async (req: Request, res: Response) => {
+	const { token, password } = req.body;
+	res.status(200).json({ message: 'Password reset successfully' });
+};
+
+const logout = (req: Request, res: Response) => {
+	// req.logout();
+	res.status(200).json({});
+};
+
+// Twitter Authentication
 const twitterAuth = (req: Request, res: Response) => {
 	// start the twitter authentication flow
 	passport.authenticate('twitter');
 };
 
-// controller function to handle the twitter callback
 const twitterAuthCallback = (req: Request, res: Response) => {
 	passport.authenticate('twitter', (err: any, user: any) => {
 		if (err) {
@@ -100,9 +135,15 @@ const twitterAuthCallback = (req: Request, res: Response) => {
 	})(req, res);
 };
 
-const logout = (req: Request, res: Response) => {
-	// req.logout();
-	res.status(200).json({});
+export {
+	googleAuth,
+	callback,
+	registerUser,
+	verifyEmail,
+	loginUser,
+	logout,
+	forgotPassword,
+	resetPassword,
+	twitterAuth,
+	twitterAuthCallback,
 };
-
-export { googleAuth, twitterAuth, logout, callback, twitterAuthCallback };
