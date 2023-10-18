@@ -223,6 +223,85 @@ const swaggerDocument = {
                 },
             },
         },
+        '/api/events/filter': {
+            get: {
+                tags: ['Events'],
+                summary: 'Filter Events',
+                description: 'Filter events based on location, category, date, and event type.',
+                parameters: [
+                    {
+                        name: 'location',
+                        in: 'query',
+                        description: 'Location to filter events by.',
+                        required: false,
+                        schema: {
+                            type: 'string',
+                        },
+                    },
+                    {
+                        name: 'category',
+                        in: 'query',
+                        description: 'Category to filter events by.',
+                        required: false,
+                        schema: {
+                            type: 'string',
+                        },
+                    },
+                    {
+                        name: 'date',
+                        in: 'query',
+                        description: 'Date to filter events by (e.g., YYYY-MM-DD).',
+                        required: false,
+                        schema: {
+                            type: 'string',
+                        },
+                    },
+                    {
+                        name: 'eventType',
+                        in: 'query',
+                        description: 'Event type to filter events by.',
+                        required: false,
+                        schema: {
+                            type: 'string',
+                        },
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: 'Filtered events fetched successfully',
+                    },
+                    400: {
+                        description: 'Bad request. Invalid query parameters.',
+                    },
+                    500: {
+                        description: 'Internal server error.',
+                    },
+                },
+            },
+        },
+        '/api/events/search': {
+            get: {
+                tags: ['Event'],
+                summary: 'Search Events',
+                description: 'This route is used to search for events by name.',
+                parameters: [
+                    {
+                        name: 'keyword',
+                        in: 'query',
+                        required: true,
+                        type: 'string',
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: 'Events matching the search retrieved successfully.',
+                    },
+                    404: {
+                        description: 'No matching events found.',
+                    },
+                },
+            },
+        },
         '/api/events': {
             post: {
                 tags: ['Event'],
@@ -277,29 +356,6 @@ const swaggerDocument = {
                     },
                     404: {
                         description: 'No events found.',
-                    },
-                },
-            },
-        },
-        '/api/events/search': {
-            get: {
-                tags: ['Event'],
-                summary: 'Search Events',
-                description: 'This route is used to search for events by name.',
-                parameters: [
-                    {
-                        name: 'keyword',
-                        in: 'query',
-                        required: true,
-                        type: 'string',
-                    },
-                ],
-                responses: {
-                    200: {
-                        description: 'Events matching the search retrieved successfully.',
-                    },
-                    404: {
-                        description: 'No matching events found.',
                     },
                 },
             },

@@ -28,6 +28,11 @@ router.get('/friends', auth_middleware_1.default, event_controller_1.getFriendEv
  * PROTECTED ROUTE
  */
 router.get('/calendar', auth_middleware_1.default, event_controller_1.getEventsCalendar);
+/*@GET /events/filter
+ * This route should take care of filtering events
+ * PROTECTED ROUTE
+ */
+router.get('/filter', event_controller_1.filterEvents);
 /*@GET /events/search?keyword=
  * This route should take care of the searching event by name
  */
