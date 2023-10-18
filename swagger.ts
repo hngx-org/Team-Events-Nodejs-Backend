@@ -255,11 +255,11 @@ const swaggerDocument = {
 				},
 			},
 		},
-		'/api/events/friends': {
+		'/api/events/upcoming': {
 			get: {
 				tags: ['Event'],
-				summary: 'Get Friend Events',
-				description: 'This route is used to get all events of members of shared groups.',
+				summary: 'Get upcoming Events',
+				// description: 'This route is used to get all events of members of shared groups.',
 				responses: {
 					200: {
 						description: 'Friend events retrieved successfully.',
@@ -371,168 +371,6 @@ const swaggerDocument = {
 					},
 					404: {
 						description: 'Event not found.',
-					},
-				},
-			},
-		},
-
-		'/api/comments/{eventId}': {
-			post: {
-				tags: ['Comment'],
-				summary: 'Create Comment',
-				description: 'This route is used to create a comment.',
-				parameters: [
-					{
-						name: 'eventId',
-						in: 'path',
-						required: true,
-						type: 'string',
-					},
-				],
-				requestBody: {
-					required: true,
-					content: {
-						'application/json': {
-							schema: {
-								type: 'object',
-								properties: {
-									comment: {
-										type: 'string',
-									},
-								},
-							},
-							example: {
-								comment: 'Nice. I will be there.',
-							},
-						},
-					},
-				},
-				responses: {
-					201: {
-						description: 'Comment created successfully.',
-					},
-					500: {
-						description: 'Error creating comment.',
-					},
-				},
-			},
-			get: {
-				tags: ['Comment'],
-				summary: 'Get Comments',
-				description: 'This route is used to get comments.',
-				parameters: [
-					{
-						name: 'eventId',
-						in: 'path',
-						required: true,
-						type: 'string',
-					},
-				],
-				responses: {
-					201: {
-						description: 'Comments retrieved successfully.',
-					},
-					404: {
-						description: 'No comments found for this event.',
-					},
-				},
-			},
-		},
-
-		'/api/groups': {
-			post: {
-				tags: ['Groups'],
-				summary: 'Create Group',
-				description:
-					'This route is used to create groups (no page on the design for this, but just use the information in the table)',
-				responses: {
-					201: {
-						description: 'Group created successfully.',
-					},
-					500: {
-						description: 'Group creation error.',
-					},
-				},
-			},
-			get: {
-				tags: ['Groups'],
-				summary: 'Get User Groups',
-				description: 'This route is used to get all groups that a user is a part of.',
-				responses: {
-					200: {
-						description: 'User group fetched successfully.',
-					},
-					404: {
-						description: 'User not found.',
-					},
-				},
-			},
-		},
-		'/api/groups/{groupId}/addUser': {
-			post: {
-				tags: ['Groups'],
-				summary: 'Add user to group',
-				description: 'This route is used add a user to a group using the user email address.',
-				parameters: [
-					{
-						name: 'groupId',
-						in: 'path',
-						required: true,
-						type: 'string',
-					},
-				],
-				responses: {
-					201: {
-						description: 'User added successfully.',
-					},
-					500: {
-						description: 'Error adding user.',
-					},
-				},
-			},
-		},
-		'/api/groups/info/{groupId}': {
-			get: {
-				tags: ['Groups'],
-				summary: 'Get Group by ID',
-				description: 'This route is used to get a particular group by its ID.',
-				parameters: [
-					{
-						name: 'groupId',
-						in: 'path',
-						required: true,
-						type: 'string',
-					},
-				],
-				responses: {
-					200: {
-						description: 'Group retrieved successfully.',
-					},
-					404: {
-						description: 'Group not found.',
-					},
-				},
-			},
-		},
-		'/api/groups/events/{groupId}': {
-			get: {
-				tags: ['Groups'],
-				summary: 'Get Events in Group',
-				description: 'This route is used to get all events under a specific group.',
-				parameters: [
-					{
-						name: 'groupId',
-						in: 'path',
-						required: true,
-						type: 'string',
-					},
-				],
-				responses: {
-					200: {
-						description: 'Events retrieved successfully.',
-					},
-					404: {
-						description: 'No events found for this group.',
 					},
 				},
 			},
