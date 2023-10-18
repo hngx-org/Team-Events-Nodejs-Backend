@@ -225,7 +225,7 @@ const swaggerDocument = {
         },
         '/api/events/filter': {
             get: {
-                tags: ['Events'],
+                tags: ['Event'],
                 summary: 'Filter Events',
                 description: 'Filter events based on location, category, date, and event type.',
                 parameters: [
