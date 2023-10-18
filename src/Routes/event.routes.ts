@@ -9,6 +9,7 @@ import {
 	deleteEvent,
 	updateEvent,
 	getEventsCalendar,
+	filterEvents,
 } from '../Controllers/event.controller';
 import protect from '../middleware/auth.middleware';
 const router = Router();
@@ -36,6 +37,12 @@ router.get('/friends', protect, getFriendEvent);
  * PROTECTED ROUTE
  */
 router.get('/calendar', protect, getEventsCalendar);
+
+/*@GET /events/filter
+ * This route should take care of filtering events
+ * PROTECTED ROUTE
+ */
+router.get('/filter', filterEvents);
 
 /*@GET /events/search?keyword=
  * This route should take care of the searching event by name
