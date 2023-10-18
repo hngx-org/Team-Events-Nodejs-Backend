@@ -131,6 +131,15 @@ const getUpcomingEvents = async (req: Request, res: Response) => {
 	}
 };
 
+const filterEvents = async (req: Request, res: Response) => {
+	const events = await prisma.event.findMany();
+	if (events.length > 0) {
+		res.status(200).json(events);
+	} else {
+		res.status(404).json({ error: 'No events found' });
+	}
+};
+
 const eventSearch = async (req: Request, res: Response) => {
 	if (typeof req.query.keyword != 'string') {
 		return res.status(400).json({
@@ -244,6 +253,7 @@ export {
 	createEvent,
 	deleteEvent,
 	eventSearch,
+	filterEvents,
 	getAllEvents,
 	getEventById,
 	getUpcomingEvents,
