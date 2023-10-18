@@ -4,8 +4,8 @@ config();
 
 const clientId = process.env['GOOGLE_CLIENT_ID'];
 const clientSecret = process.env['GOOGLE_CLIENT_SECRET'];
-// const redirectUri = 'http://localhost:3000';
-const redirectUri = 'https://zuri-event-webapp2.vercel.app';
+// const redirectUri = 'https://zuri-event-webapp2.vercel.app';
+const redirectUri = 'https://event-tan-iota.vercel.app';
 
 const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
 
