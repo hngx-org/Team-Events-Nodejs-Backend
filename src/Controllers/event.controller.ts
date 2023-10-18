@@ -6,64 +6,57 @@ const prisma = new PrismaClient();
 
 const createEvent = async (req: Request, res: Response) => {
 	try {
-		const userId = (req.user as User).id;
-
-		const requestSchema = Joi.object({
-			event_name: Joi.string().required(),
-			event_description: Joi.string().required(),
-			event_start: Joi.date().iso().required(),
-			event_end: Joi.date().iso().required(),
-			location: Joi.string().required(),
-			groupId: Joi.string(),
-		});
-
-		const { error } = requestSchema.validate(req.body);
-		if (error) return res.status(400).json({ error: error.details[0].message });
-
-		let uploadedImage = '';
-		if (req.file) {
-			// File upload (cloudinary)
-			const { secure_url } = await cloudinary.uploader.upload(req.file.path);
-			uploadedImage = secure_url;
-		}
-
-		const { event_name, event_description, event_start, event_end, location, groupId } = req.body;
-		const newEvent = await prisma.event.create({
-			data: {
-				event_name,
-				event_description,
-				image: uploadedImage,
-				event_start,
-				event_end,
-				location,
-				created_by: userId,
-			},
-		});
-
-		// Associate the event with a group
-		if (groupId) {
-			const group = await prisma.group.findUnique({
-				where: { id: groupId },
-			});
-
-			if (group) {
-				await prisma.eventGroup.create({
-					data: {
-						event: { connect: { id: newEvent.id } },
-						group: { connect: { id: groupId } },
-					},
-				});
-			} else {
-				// If the specified group doesn't exist, you may want to handle this case
-				return res.status(404).json({ error: 'Group not found' });
-			}
-		}
-
-		res.status(201).json({
-			statusCode: 201,
-			message: 'Event created successfully',
-			data: newEvent,
-		});
+		// const userId = (req.user as User).id;
+		// const requestSchema = Joi.object({
+		// 	event_name: Joi.string().required(),
+		// 	event_description: Joi.string().required(),
+		// 	event_start: Joi.date().iso().required(),
+		// 	event_end: Joi.date().iso().required(),
+		// 	location: Joi.string().required(),
+		// 	groupId: Joi.string(),
+		// });
+		// const { error } = requestSchema.validate(req.body);
+		// if (error) return res.status(400).json({ error: error.details[0].message });
+		// let uploadedImage = '';
+		// if (req.file) {
+		// 	// File upload (cloudinary)
+		// 	const { secure_url } = await cloudinary.uploader.upload(req.file.path);
+		// 	uploadedImage = secure_url;
+		// }
+		// const { event_name, event_description, event_start, event_end, location, groupId } = req.body;
+		// const newEvent = await prisma.event.create({
+		// 	data: {
+		// 		event_name,
+		// 		event_description,
+		// 		image: uploadedImage,
+		// 		event_start,
+		// 		event_end,
+		// 		location,
+		// 		created_by: userId,
+		// 	},
+		// });
+		// // Associate the event with a group
+		// if (groupId) {
+		// 	const group = await prisma.group.findUnique({
+		// 		where: { id: groupId },
+		// 	});
+		// 	if (group) {
+		// 		await prisma.eventGroup.create({
+		// 			data: {
+		// 				event: { connect: { id: newEvent.id } },
+		// 				group: { connect: { id: groupId } },
+		// 			},
+		// 		});
+		// 	} else {
+		// 		// If the specified group doesn't exist, you may want to handle this case
+		// 		return res.status(404).json({ error: 'Group not found' });
+		// 	}
+		// }
+		// res.status(201).json({
+		// 	statusCode: 201,
+		// 	message: 'Event created successfully',
+		// 	data: newEvent,
+		// });
 	} catch (error) {
 		console.error('Error creating event:', error);
 		res.status(500).json({ error: 'Error creating event' });
@@ -72,45 +65,40 @@ const createEvent = async (req: Request, res: Response) => {
 
 // update event
 const updateEvent = async (req: Request, res: Response) => {
-	try {
-		const requestSchema = Joi.object({
-			event_name: Joi.string(),
-			event_description: Joi.string(),
-			event_start: Joi.date().iso(),
-			event_end: Joi.date().iso(),
-			location: Joi.string(),
-		});
-
-		const { error } = requestSchema.validate(req.body);
-		if (error) return res.status(400).json({ error: error.details[0].message });
-
-		const { event_name, event_description, event_start, event_end, location } = req.body;
-
-		const { secure_url } = await cloudinary.uploader.upload(req.file.path);
-
-		const updateEvent: Event = await prisma.event.update({
-			where: {
-				id: req.params.eventId,
-			},
-			data: {
-				event_name,
-				event_description,
-				image: secure_url,
-				event_start,
-				event_end,
-				location,
-			},
-		});
-
-		res.status(201).json({
-			statusCode: 201,
-			message: 'Event updated successfully',
-			data: updateEvent,
-		});
-	} catch (error) {
-		console.error('Error creating event:', error);
-		res.status(500).json({ error: 'Error updating event' });
-	}
+	// try {
+	// 	const requestSchema = Joi.object({
+	// 		event_name: Joi.string(),
+	// 		event_description: Joi.string(),
+	// 		event_start: Joi.date().iso(),
+	// 		event_end: Joi.date().iso(),
+	// 		location: Joi.string(),
+	// 	});
+	// 	const { error } = requestSchema.validate(req.body);
+	// 	if (error) return res.status(400).json({ error: error.details[0].message });
+	// 	const { event_name, event_description, event_start, event_end, location } = req.body;
+	// 	const { secure_url } = await cloudinary.uploader.upload(req.file.path);
+	// 	const updateEvent: Event = await prisma.event.update({
+	// 		where: {
+	// 			id: req.params.eventId,
+	// 		},
+	// 		data: {
+	// 			event_name,
+	// 			event_description,
+	// 			image: secure_url,
+	// 			event_start,
+	// 			event_end,
+	// 			location,
+	// 		},
+	// 	});
+	// 	res.status(201).json({
+	// 		statusCode: 201,
+	// 		message: 'Event updated successfully',
+	// 		data: updateEvent,
+	// 	});
+	// } catch (error) {
+	// 	console.error('Error creating event:', error);
+	// 	res.status(500).json({ error: 'Error updating event' });
+	// }
 };
 
 const getAllEvents = async (req: Request, res: Response) => {
@@ -133,39 +121,10 @@ const getEventsCalendar = async (req: Request, res: Response) => {
 	}
 };
 
-const getFriendEvent = async (req: Request, res: Response) => {
+const getUpcomingEvents = async (req: Request, res: Response) => {
 	try {
 		const userId = (req.user as User).id;
-
-		// Find all groups that the user belongs to
-		const userGroups = await prisma.userGroup.findMany({
-			where: {
-				user_id: userId,
-			},
-			select: {
-				group_id: true,
-			},
-		});
-
-		// Find all events that belong to the groups that the user belongs to
-		const groupIds = userGroups.map((userGroup) => userGroup.group_id);
-		const friendEvents = await prisma.event.findMany({
-			where: {
-				event_group: {
-					some: {
-						group_id: {
-							in: groupIds,
-						},
-					},
-				},
-			},
-		});
-
-		if (friendEvents.length > 0) {
-			res.json(friendEvents);
-		} else {
-			res.json({ error: 'No events found' });
-		}
+		res.json({ error: 'No events found' });
 	} catch (error) {
 		console.error('Error fetching friend events:', error);
 		res.status(500).json({ error: 'Error fetching friend events' });
@@ -196,13 +155,13 @@ const eventSearch = async (req: Request, res: Response) => {
 			where: {
 				OR: [
 					{
-						event_name: {
+						name: {
 							contains: keyWord,
 							mode: 'insensitive', // Perform case-insensitive search
 						},
 					},
 					{
-						event_description: {
+						description: {
 							contains: keyWord,
 							mode: 'insensitive',
 						},
@@ -260,6 +219,14 @@ const getEventById = async (req: Request, res: Response) => {
 	});
 };
 
+const registerForEvent = async (req: Request, res: Response) => {
+	try {
+		res.json({ error: 'Still in development' });
+	} catch (error) {
+		//
+	}
+};
+
 const deleteEvent = async (req: Request, res: Response) => {
 	const requestSchema = Joi.object({
 		eventId: Joi.string().required(),
@@ -289,7 +256,8 @@ export {
 	filterEvents,
 	getAllEvents,
 	getEventById,
-	getFriendEvent,
+	getUpcomingEvents,
 	updateEvent,
 	getEventsCalendar,
+	registerForEvent,
 };

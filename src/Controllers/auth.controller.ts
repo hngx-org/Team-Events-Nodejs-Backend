@@ -132,7 +132,8 @@ const registerUser = async (req: Request, res: Response) => {
 
 const verifyEmail = async (req: Request, res: Response) => {
 	try {
-		const redirectURL: string = 'http://localhost:3000/dashboard/?email_verified=';
+		// const redirectURL: string = 'http://localhost:3000/timeline/?email_verified=';
+		const redirectURL: string = 'https://event-tan-iota.vercel.app/timeline/?email_verified=';
 		const { token } = req.query;
 		const user = await prisma.user.findFirst({
 			where: {
