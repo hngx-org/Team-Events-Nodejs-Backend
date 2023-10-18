@@ -56,8 +56,9 @@ model Event {
   ticketPrice        Float
   isPaidEvent        Boolean
   location           String?
-  event_link         String?
-  registrationClosed DateTime
+  eventLink         String?
+  registrationClosingDate DateTime
+  numberOfAvailableTickets Int
 
   organizerId String
   organizer   User   @relation(fields: [organizerId], references: [id])

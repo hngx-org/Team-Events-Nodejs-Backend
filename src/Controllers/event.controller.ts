@@ -1,4 +1,4 @@
-import { Event, PrismaClient, User } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import { Request, Response } from 'express';
 import Joi from 'joi';
 import cloudinary from '../config/cloudinaryConfig';
@@ -6,62 +6,72 @@ const prisma = new PrismaClient();
 
 const createEvent = async (req: Request, res: Response) => {
 	try {
-		// const userId = (req.user as User).id;
-		// const requestSchema = Joi.object({
-		// 	event_name: Joi.string().required(),
-		// 	event_description: Joi.string().required(),
-		// 	event_start: Joi.date().iso().required(),
-		// 	event_end: Joi.date().iso().required(),
-		// 	location: Joi.string().required(),
-		// 	groupId: Joi.string(),
-		// });
-		// const { error } = requestSchema.validate(req.body);
-		// if (error) return res.status(400).json({ error: error.details[0].message });
-		// let uploadedImage = '';
-		// if (req.file) {
-		// 	// File upload (cloudinary)
-		// 	const { secure_url } = await cloudinary.uploader.upload(req.file.path);
-		// 	uploadedImage = secure_url;
-		// }
-		// const { event_name, event_description, event_start, event_end, location, groupId } = req.body;
-		// const newEvent = await prisma.event.create({
-		// 	data: {
-		// 		event_name,
-		// 		event_description,
-		// 		image: uploadedImage,
-		// 		event_start,
-		// 		event_end,
-		// 		location,
-		// 		created_by: userId,
-		// 	},
-		// });
-		// // Associate the event with a group
-		// if (groupId) {
-		// 	const group = await prisma.group.findUnique({
-		// 		where: { id: groupId },
-		// 	});
-		// 	if (group) {
-		// 		await prisma.eventGroup.create({
-		// 			data: {
-		// 				event: { connect: { id: newEvent.id } },
-		// 				group: { connect: { id: groupId } },
-		// 			},
-		// 		});
-		// 	} else {
-		// 		// If the specified group doesn't exist, you may want to handle this case
-		// 		return res.status(404).json({ error: 'Group not found' });
-		// 	}
-		// }
-		// res.status(201).json({
-		// 	statusCode: 201,
-		// 	message: 'Event created successfully',
-		// 	data: newEvent,
-		// });
+		const userId = (req.user as User).id;
+
+		const requestSchema = Joi.object({
+			name: Joi.string().required(),
+			description: Joi.string().required(),
+			startDate: Joi.date().iso().required(),
+			startTime: Joi.any().required(),
+			endDate: Joi.date().iso().required(),
+			endTime: Joi.any().required(),
+			location: Joi.string(),
+			tags: Joi.array().items(Joi.string()).required(),
+			isPaidEvent: Joi.boolean().required(),
+			eventLink: Joi.string(),
+			ticketPrice: Joi.number().when('isPaidEvent', {
+				is: false,
+				then: Joi.number().valid(0.0),
+				otherwise: Joi.number().required(),
+			}),
+			numberOfAvailableTickets: Joi.number().required(),
+			registrationClosingDate: Joi.date().iso().required(),
+		});
+
+		const { error, value } = requestSchema.validate(req.body);
+		if (error) return res.status(400).json({ error: error.details[0].message });
+
+		let uploadedImage = '';
+		if (req.file) {
+			// File upload (Cloudinary)
+			const { secure_url } = await cloudinary.uploader.upload(req.file.path);
+			uploadedImage = secure_url;
+		}
+
+		// Create the event
+		const newEvent = await prisma.event.create({
+			data: {
+				name: value.name,
+				description: value.description,
+				image: uploadedImage,
+				startTime: value.startTime,
+				endTime: value.endTime,
+				startDate: value.startDate,
+				endDate: value.endDate,
+				location: value.location,
+				isPaidEvent: value.isPaidEvent,
+				eventLink: value.eventLink,
+				ticketPrice: value.ticketPrice,
+				numberOfAvailableTickets: value.numberOfAvailableTickets,
+				registrationClosingDate: value.registrationClosingDate,
+				organizer: {
+					connect: { id: userId },
+				},
+			},
+		});
+
+		// Respond with the created event
+		res.status(201).json({
+			statusCode: 201,
+			message: 'Event created successfully',
+			data: newEvent,
+		});
 	} catch (error) {
 		console.error('Error creating event:', error);
 		res.status(500).json({ error: 'Error creating event' });
 	}
 };
+
 
 // update event
 const updateEvent = async (req: Request, res: Response) => {
@@ -256,8 +266,8 @@ export {
 	filterEvents,
 	getAllEvents,
 	getEventById,
-	getUpcomingEvents,
-	updateEvent,
 	getEventsCalendar,
+	getUpcomingEvents,
 	registerForEvent,
+	updateEvent,
 };
