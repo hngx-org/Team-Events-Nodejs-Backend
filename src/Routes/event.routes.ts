@@ -5,10 +5,11 @@ import {
 	eventSearch,
 	getAllEvents,
 	getEventById,
-	getFriendEvent,
 	deleteEvent,
 	updateEvent,
 	getEventsCalendar,
+	getUpcomingEvents,
+	registerForEvent,
 } from '../Controllers/event.controller';
 import protect from '../middleware/auth.middleware';
 const router = Router();
@@ -25,11 +26,10 @@ router.post('/', upload.single('image'), protect, createEvent);
  */
 router.get('/', getAllEvents);
 
-/*@GET /events/friends
- * This route should take care of getting all events of members of shared groups
+/*@GET /events/upcoming
  * PROTECTED ROUTE
  */
-router.get('/friends', protect, getFriendEvent);
+router.get('/upcoming', getUpcomingEvents);
 
 /*@GET /events/calendar
  * This route should take care of getting all events (calendar)
@@ -42,10 +42,15 @@ router.get('/calendar', protect, getEventsCalendar);
  */
 router.get('/search', eventSearch);
 
-/*@GET /events/info/eventId
+/*@GET /events/eventId/register
+ * This route should take care of registering the user a particular event
+ */
+router.get('/:eventId/register', registerForEvent);
+
+/*@GET /events/eventId
  * This route should take care of getting a particular event
  */
-router.get('/info/:eventId', getEventById);
+router.get('/:eventId', getEventById);
 
 /*@PUT /events/:id
  * This route should take care of updating events should return a 201
