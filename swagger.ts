@@ -312,13 +312,82 @@ const swaggerDocument = {
 			post: {
 				tags: ['Event'],
 				summary: 'Create Event',
-				description: 'This route is used to create an event.',
+				description: 'Create a new event with optional image upload.',
+				requestBody: {
+					content: {
+						'multipart/form-data': {
+							schema: {
+								type: 'object',
+								properties: {
+									name: { type: 'string' },
+									description: { type: 'string' },
+									startDate: { type: 'string', format: 'date-time' },
+									startTime: { type: 'string' },
+									endDate: { type: 'string', format: 'date-time' },
+									endTime: { type: 'string' },
+									location: { type: 'string' },
+									tags: { type: 'array', items: { type: 'string' } },
+									isPaidEvent: { type: 'boolean' },
+									eventLink: { type: 'string' },
+									ticketPrice: { type: 'number' },
+									numberOfAvailableTickets: { type: 'integer' },
+									registrationClosingDate: { type: 'string', format: 'date-time' },
+									// Add an image field here if needed
+								},
+							},
+						},
+					},
+				},
 				responses: {
 					201: {
 						description: 'Event created successfully.',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										statusCode: { type: 'integer', example: 201 },
+										message: { type: 'string', example: 'Event created successfully' },
+										data: {
+											type: 'object',
+											properties: {
+												// Define the structure of the returned event object
+												id: { type: 'string' },
+												name: { type: 'string' },
+												description: { type: 'string' },
+												// Include other event properties here
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					400: {
+						description: 'Bad Request - Validation error.',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										error: { type: 'string' },
+									},
+								},
+							},
+						},
 					},
 					500: {
-						description: 'Event creation error.',
+						description: 'Internal Server Error - Event creation error.',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										error: { type: 'string' },
+									},
+								},
+							},
+						},
 					},
 				},
 			},
