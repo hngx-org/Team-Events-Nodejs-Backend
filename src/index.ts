@@ -21,6 +21,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Routes
 app.use('/api', index);
+app.get('/', (req, res) => res.send({ message: 'Team Events' }));
 
 const PORT: number = Number(process.env.PORT) || 8080;
 const server = app.listen(PORT, () => {
