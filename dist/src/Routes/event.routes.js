@@ -40,6 +40,11 @@ router.post('/register/:eventId', auth_middleware_1.default, event_controller_1.
  * This route should: Cancel user Registration to an event
  */
 router.post('/unregister/:eventId', auth_middleware_1.default, event_controller_1.unregisterUserForEvent);
+/*@GET /events/created
+ * This route should take care of getting events created by a particular user
+ * NOT PROTECTED ROUTE
+ */
+router.get('/created', auth_middleware_1.default, event_controller_1.getCreatedEvents);
 /*@GET /events/search?keyword=
  * This route should take care of the searching event by name
  */

@@ -319,6 +319,88 @@ const swaggerDocument = {
                     },
                 },
             },
+            put: {
+                tags: ['Event'],
+                summary: 'Update A Particular Event',
+                description: 'This endpoint updates a particular event, note that the request body data is not compulaosry, you only send what you want to update.',
+                requestBody: {
+                    content: {
+                        'multipart/form-data': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    name: { type: 'string' },
+                                    description: { type: 'string' },
+                                    startDate: { type: 'string', format: 'date-time' },
+                                    startTime: { type: 'string' },
+                                    endDate: { type: 'string', format: 'date-time' },
+                                    endTime: { type: 'string' },
+                                    location: { type: 'string' },
+                                    tags: { type: 'array', items: { type: 'string' } },
+                                    isPaidEvent: { type: 'boolean' },
+                                    eventLink: { type: 'string' },
+                                    ticketPrice: { type: 'number' },
+                                    numberOfAvailableTickets: { type: 'integer' },
+                                    registrationClosingDate: { type: 'string', format: 'date-time' },
+                                    // Add an image field here if needed
+                                },
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: 'Event updated successfully.',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        statusCode: { type: 'integer', example: 201 },
+                                        message: { type: 'string', example: 'Event created successfully' },
+                                        data: {
+                                            type: 'object',
+                                            properties: {
+                                                // Define the structure of the returned event object
+                                                id: { type: 'string' },
+                                                name: { type: 'string' },
+                                                description: { type: 'string' },
+                                                // Include other event properties here
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    400: {
+                        description: 'Bad Request - Validation error.',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        error: { type: 'string' },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    500: {
+                        description: 'Internal Server Error - Event update error.',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        error: { type: 'string' },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
         '/api/events/upcoming': {
             get: {
@@ -479,6 +561,24 @@ const swaggerDocument = {
                 },
             },
         },
+        '/api/events/created': {
+            get: {
+                tags: ['Event'],
+                summary: 'Get all events created by a user',
+                description: 'This endpoint would get all the events created by the current user.',
+                responses: {
+                    200: {
+                        description: 'User events retrieved successfully',
+                    },
+                    404: {
+                        description: 'User not found',
+                    },
+                    500: {
+                        description: 'Error getting user events',
+                    },
+                },
+            },
+        },
         '/api/events/search': {
             get: {
                 tags: ['Event'],
@@ -578,6 +678,80 @@ const swaggerDocument = {
                     },
                     404: {
                         description: 'Event not found.',
+                    },
+                },
+            },
+        },
+        '/api/user/update-profile': {
+            put: {
+                tags: ['User'],
+                summary: 'Update User Profile',
+                description: "Update the user's profile information including first name, last name, and phone number.",
+                requestBody: {
+                    required: true,
+                    content: {
+                        'multipart/form-data': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    firstname: {
+                                        type: 'string',
+                                        description: "User's first name.",
+                                    },
+                                    lastname: {
+                                        type: 'string',
+                                        description: "User's last name.",
+                                    },
+                                    phonenumber: {
+                                        type: 'string',
+                                        description: "User's phone number.",
+                                    },
+                                    avatar: {
+                                        type: 'string',
+                                        format: 'binary',
+                                        description: "User's avatar image.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: 'User profile successfully updated.',
+                    },
+                    500: {
+                        description: 'Internal server error. An error occurred while processing the request.',
+                    },
+                },
+            },
+        },
+        '/api/user/change-password': {
+            patch: {
+                tags: ['User'],
+                summary: 'Change Password',
+                description: 'Change the password for the current user.',
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            example: {
+                                currentPassword: 'yourpassword',
+                                newPassword: 'yournewpassword',
+                                confirmNewPassword: 'yournewpassword',
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: 'Password changed successfully.',
+                    },
+                    400: {
+                        description: 'Invalid input or error in the request.',
+                    },
+                    500: {
+                        description: 'Internal server error.',
                     },
                 },
             },

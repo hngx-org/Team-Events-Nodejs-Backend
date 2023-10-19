@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateEvent = exports.unregisterUserForEvent = exports.registerUserForEvent = exports.getUpcomingEvents = exports.getEventsCalendar = exports.getEventById = exports.getAllEvents = exports.filterEvents = exports.eventSearch = exports.deleteEvent = exports.createEvent = void 0;
+exports.updateEvent = exports.unregisterUserForEvent = exports.registerUserForEvent = exports.getUpcomingEvents = exports.getCreatedEvents = exports.getEventsCalendar = exports.getEventById = exports.getAllEvents = exports.filterEvents = exports.eventSearch = exports.deleteEvent = exports.createEvent = void 0;
 const client_1 = require("@prisma/client");
 const joi_1 = __importDefault(require("joi"));
 const cloudinaryConfig_1 = __importDefault(require("../config/cloudinaryConfig"));
@@ -76,40 +76,76 @@ const createEvent = async (req, res) => {
 };
 exports.createEvent = createEvent;
 const updateEvent = async (req, res) => {
-    // try {
-    // 	const requestSchema = Joi.object({
-    // 		event_name: Joi.string(),
-    // 		event_description: Joi.string(),
-    // 		event_start: Joi.date().iso(),
-    // 		event_end: Joi.date().iso(),
-    // 		location: Joi.string(),
-    // 	});
-    // 	const { error } = requestSchema.validate(req.body);
-    // 	if (error) return res.status(400).json({ error: error.details[0].message });
-    // 	const { event_name, event_description, event_start, event_end, location } = req.body;
-    // 	const { secure_url } = await cloudinary.uploader.upload(req.file.path);
-    // 	const updateEvent: Event = await prisma.event.update({
-    // 		where: {
-    // 			id: req.params.eventId,
-    // 		},
-    // 		data: {
-    // 			event_name,
-    // 			event_description,
-    // 			image: secure_url,
-    // 			event_start,
-    // 			event_end,
-    // 			location,
-    // 		},
-    // 	});
-    // 	res.status(201).json({
-    // 		statusCode: 201,
-    // 		message: 'Event updated successfully',
-    // 		data: updateEvent,
-    // 	});
-    // } catch (error) {
-    // 	console.error('Error creating event:', error);
-    // 	res.status(500).json({ error: 'Error updating event' });
-    // }
+    try {
+        const requestSchema = joi_1.default.object({
+            eventId: joi_1.default.string().required(),
+        });
+        const { error: requestSchemaError, value: requestSchemaValue } = requestSchema.validate(req.params);
+        if (requestSchemaError)
+            return res.status(400).json({ error: requestSchemaError.details[0].message });
+        const { eventId } = requestSchemaValue;
+        const updateSchema = joi_1.default.object({
+            name: joi_1.default.string(),
+            description: joi_1.default.string(),
+            startDate: joi_1.default.date().iso(),
+            startTime: joi_1.default.any(),
+            endDate: joi_1.default.date().iso(),
+            endTime: joi_1.default.any(),
+            tags: joi_1.default.array().items(joi_1.default.string()),
+            isPaidEvent: joi_1.default.boolean(),
+            location: joi_1.default.string(),
+            eventLink: joi_1.default.string(),
+            ticketPrice: joi_1.default.number().when('isPaidEvent', {
+                is: false,
+                then: joi_1.default.number().valid(0.0),
+                otherwise: joi_1.default.number(),
+            }),
+            numberOfAvailableTickets: joi_1.default.number(),
+            registrationClosingDate: joi_1.default.date().iso(),
+        });
+        const { error, value } = updateSchema.validate(req.body);
+        if (error)
+            return res.status(400).json({ error: error.details[0].message });
+        // Fetch the existing event by ID
+        const existingEvent = await prisma.event.findUnique({
+            where: {
+                id: eventId,
+            },
+        });
+        if (!existingEvent) {
+            return res.status(404).json({ error: 'Event not found' });
+        }
+        const updatedEvent = await prisma.event.update({
+            where: {
+                id: eventId,
+            },
+            data: {
+                name: value?.name || existingEvent.name,
+                description: value?.description || existingEvent.description,
+                startDate: value?.startDate || existingEvent.startDate,
+                startTime: value?.startTime || existingEvent.startTime,
+                endDate: value?.endDate || existingEvent.endDate,
+                endTime: value?.endTime || existingEvent.endTime,
+                tags: value?.tags || existingEvent.tags,
+                isPaidEvent: value?.isPaidEvent || existingEvent.isPaidEvent,
+                location: value?.location || existingEvent.location,
+                eventLink: value?.eventLink || existingEvent.eventLink,
+                eventType: value?.location ? 'Physical' : 'Virtual',
+                ticketPrice: value?.ticketPrice || existingEvent.ticketPrice,
+                numberOfAvailableTickets: value?.numberOfAvailableTickets || existingEvent.numberOfAvailableTickets,
+                registrationClosingDate: value?.registrationClosingDate || existingEvent.registrationClosingDate,
+            },
+        });
+        res.status(200).json({
+            statusCode: 200,
+            message: 'Event updated successfully',
+            data: updatedEvent,
+        });
+    }
+    catch (error) {
+        console.error('Error updating event:', error);
+        res.status(500).json({ error: 'Error updating event' });
+    }
 };
 exports.updateEvent = updateEvent;
 const getAllEvents = async (req, res) => {
@@ -127,6 +163,34 @@ const getAllEvents = async (req, res) => {
     }
 };
 exports.getAllEvents = getAllEvents;
+const getCreatedEvents = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const userEvents = await prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
+            include: {
+                event: true,
+            },
+        });
+        if (!userEvents) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        const createdEvents = userEvents.event;
+        // Respond with the user's created events
+        res.status(200).json({
+            statusCode: 200,
+            message: 'User events retrieved successfully',
+            data: createdEvents,
+        });
+    }
+    catch (error) {
+        console.error('Error getting user events:', error);
+        res.status(500).json({ error: 'Error getting user events' });
+    }
+};
+exports.getCreatedEvents = getCreatedEvents;
 const getEventsCalendar = async (req, res) => {
     // Get all events
     const events = await prisma.event.findMany();

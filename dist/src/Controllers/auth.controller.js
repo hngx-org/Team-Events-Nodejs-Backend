@@ -6,12 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyEmail = exports.twitterAuthCallback = exports.twitterAuth = exports.resetPassword = exports.registerUser = exports.logout = exports.loginUser = exports.googleAuth = exports.forgotPassword = exports.callback = void 0;
 const client_1 = require("@prisma/client");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const mail_config_1 = __importDefault(require("./../config/mail.config"));
+const crypto_1 = require("crypto");
 const joi_1 = __importDefault(require("joi"));
 const passport_1 = __importDefault(require("passport"));
 const google_config_1 = require("../config/google.config");
 const utils_1 = require("../utils");
-const crypto_1 = require("crypto");
+const mail_config_1 = __importDefault(require("./../config/mail.config"));
 const prisma = new client_1.PrismaClient();
 // Google Authentication
 const googleAuth = (req, res) => {
