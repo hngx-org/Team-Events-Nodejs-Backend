@@ -342,25 +342,39 @@ const unregisterUserForEvent = async (req: Request, res: Response) => {
 };
 
 const deleteEvent = async (req: Request, res: Response) => {
-	const requestSchema = Joi.object({
-		eventId: Joi.string().required(),
-	});
+	try {
+		const userId = (req.user as User).id;
+		const eventId = req.params?.eventId;
 
-	const { error } = requestSchema.validate(req.params);
-	if (error) return res.status(400).json({ error: error.details[0].message });
+		// Check if the event exists
+		const event = await prisma.event.findUnique({
+			where: { id: eventId },
+		});
 
-	const eventId = req.params.eventId;
-	const event = await prisma.event.findUnique({ where: { id: eventId } });
-	if (!event) return res.status(404).json({ message: 'Event not found' });
-	// Delete event from database
-	await prisma.event.delete({ where: { id: eventId } });
-	// Delete image from cloudinary
-	if (event.image) {
-		// Extract the public ID from the image URL
-		const publicId = event.image.split('/v')[1].split('/')[1];
-		await cloudinary.uploader.destroy(publicId);
+		if (!event) {
+			return res.status(404).json({ error: 'Event not found' });
+		}
+
+		// Check if the current user is the organizer of the event
+		if (event.organizerId !== userId) {
+			return res.status(403).json({ error: 'You do not have permission to delete this event' });
+		}
+
+		// Delete the event
+		await prisma.event.delete({
+			where: { id: eventId },
+		});
+
+		// Manually clean up UserEvent records associated with the event
+		await prisma.userEvent.deleteMany({
+			where: { eventId: eventId },
+		});
+
+		res.status(200).json({ message: 'Event deleted successfully' });
+	} catch (error) {
+		console.error('Error deleting the event:', error);
+		res.status(500).json({ error: 'Internal server error' });
 	}
-	res.status(200).json({ message: 'Event deleted successfully' });
 };
 
 export {
