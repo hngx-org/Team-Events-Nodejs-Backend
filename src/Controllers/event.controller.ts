@@ -112,12 +112,18 @@ const updateEvent = async (req: Request, res: Response) => {
 };
 
 const getAllEvents = async (req: Request, res: Response) => {
-	// Get all events
-	const events = await prisma.event.findMany();
-	if (events.length > 0) {
-		res.status(200).json(events);
-	} else {
-		res.status(404).json({ error: 'No events found' });
+	try {
+		const events = await prisma.event.findMany();
+
+		let message = 'Events retrieved successfully.';
+		if (!events.length) {
+			message = 'No events found';
+		}
+
+		res.status(200).json({ message, data: events });
+	} catch (error) {
+		console.error('Error:', error);
+		res.status(500).json({ error: 'Error fetching events' });
 	}
 };
 
@@ -143,7 +149,11 @@ const getUpcomingEvents = async (req: Request, res: Response) => {
 			take: limit,
 		});
 
-		res.json({ message: 'No events found', data: upcomingEvents });
+		let message = 'Events retrieved successfully.';
+		if (!upcomingEvents.length) {
+			message = 'No events found';
+		}
+		res.status(200).json({ message, data: upcomingEvents });
 	} catch (error) {
 		console.error('Error:', error);
 		res.status(500).json({ error: 'Error fetching events' });
@@ -221,15 +231,7 @@ const eventSearch = async (req: Request, res: Response) => {
 			},
 		});
 
-		if (searchResults.length === 0) {
-			return res.status(404).json({
-				error: 'A match could not be  found',
-				message: 'No match was found',
-				statusCode: 404,
-			});
-		}
 		return res.status(200).json({
-			statusCode: 200,
 			message: 'successful',
 			data: searchResults,
 		});

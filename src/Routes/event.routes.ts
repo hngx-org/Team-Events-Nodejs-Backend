@@ -47,7 +47,7 @@ router.get('/filter', filterEvents);
 /*@GET /events/register/:eventId
  * This route should take care of registering the user a particular event
  */
-router.get('/register/:eventId', protect, registerUserForEvent);
+router.post('/register/:eventId', protect, registerUserForEvent);
 
 /*@GET /events/search?keyword=
  * This route should take care of the searching event by name
