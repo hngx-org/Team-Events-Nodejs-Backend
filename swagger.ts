@@ -227,87 +227,6 @@ const swaggerDocument = {
 			},
 		},
 
-		'/api/events/filter': {
-			get: {
-				tags: ['Event'],
-				summary: 'Filter Events',
-				description: 'Filter events based on location, category, date, and event type.',
-				parameters: [
-					{
-						name: 'location',
-						in: 'query',
-						description: 'Location to filter events by.',
-						required: false,
-						schema: {
-							type: 'string',
-						},
-					},
-					{
-						name: 'category',
-						in: 'query',
-						description: 'Category to filter events by.',
-						required: false,
-						schema: {
-							type: 'string',
-						},
-					},
-					{
-						name: 'date',
-						in: 'query',
-						description: 'Date to filter events by (e.g., YYYY-MM-DD).',
-						required: false,
-						schema: {
-							type: 'string',
-						},
-					},
-					{
-						name: 'eventType',
-						in: 'query',
-						description: 'Event type to filter events by.',
-						required: false,
-						schema: {
-							type: 'string',
-						},
-					},
-				],
-				responses: {
-					200: {
-						description: 'Filtered events fetched successfully',
-					},
-					400: {
-						description: 'Bad request. Invalid query parameters.',
-					},
-					500: {
-						description: 'Internal server error.',
-					},
-				},
-			},
-		},
-
-		'/api/events/search': {
-			get: {
-				tags: ['Event'],
-				summary: 'Search Events',
-				description: 'This route is used to search for events by name.',
-				parameters: [
-					{
-						name: 'keyword',
-						in: 'query',
-						required: true,
-						type: 'string',
-					},
-				],
-				responses: {
-					200: {
-						description: 'Events matching the search retrieved successfully.',
-					},
-					404: {
-						description: 'No matching events found.',
-					},
-				},
-			},
-		},
-
 		'/api/events': {
 			post: {
 				tags: ['Event'],
@@ -410,12 +329,100 @@ const swaggerDocument = {
 				tags: ['Event'],
 				summary: 'Get upcoming Events',
 				// description: 'This route is used to get all events of members of shared groups.',
+				parameters: [
+					{
+						name: 'limit',
+						in: 'query',
+						required: false,
+						type: 'string',
+					},
+				],
 				responses: {
 					200: {
 						description: 'Friend events retrieved successfully.',
 					},
 					404: {
 						description: 'No friend events found.',
+					},
+				},
+			},
+		},
+		'/api/events/filter': {
+			get: {
+				tags: ['Event'],
+				summary: 'Filter Events',
+				description: 'Filter events based on location, category, date, and event type.',
+				parameters: [
+					{
+						name: 'location',
+						in: 'query',
+						description: 'Location to filter events by.',
+						required: false,
+						schema: {
+							type: 'string',
+						},
+					},
+					{
+						name: 'category',
+						in: 'query',
+						description: 'Category to filter events by.',
+						required: false,
+						schema: {
+							type: 'string',
+						},
+					},
+					{
+						name: 'date',
+						in: 'query',
+						description: 'Date to filter events by (e.g., YYYY-MM-DD).',
+						required: false,
+						schema: {
+							type: 'string',
+						},
+					},
+					{
+						name: 'eventType',
+						in: 'query',
+						description: 'Event type to filter events by.',
+						required: false,
+						schema: {
+							type: 'string',
+						},
+					},
+				],
+				responses: {
+					200: {
+						description: 'Filtered events fetched successfully',
+					},
+					400: {
+						description: 'Bad request. Invalid query parameters.',
+					},
+					500: {
+						description: 'Internal server error.',
+					},
+				},
+			},
+		},
+
+		'/api/events/search': {
+			get: {
+				tags: ['Event'],
+				summary: 'Search Events',
+				description: 'This route is used to search for events by name.',
+				parameters: [
+					{
+						name: 'keyword',
+						in: 'query',
+						required: true,
+						type: 'string',
+					},
+				],
+				responses: {
+					200: {
+						description: 'Events matching the search retrieved successfully.',
+					},
+					404: {
+						description: 'No matching events found.',
 					},
 				},
 			},
@@ -436,7 +443,7 @@ const swaggerDocument = {
 			},
 		},
 
-		'/api/events/info/{eventId}': {
+		'/api/events/{eventId}': {
 			get: {
 				tags: ['Event'],
 				summary: 'Get Event by ID',
@@ -458,8 +465,6 @@ const swaggerDocument = {
 					},
 				},
 			},
-		},
-		'/api/events/{eventId}': {
 			put: {
 				tags: ['Event'],
 				summary: 'Update Event',
