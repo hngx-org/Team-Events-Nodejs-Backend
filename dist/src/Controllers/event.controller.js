@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateEvent = exports.registerUserForEvent = exports.getUpcomingEvents = exports.getEventsCalendar = exports.getEventById = exports.getAllEvents = exports.filterEvents = exports.eventSearch = exports.deleteEvent = exports.createEvent = void 0;
+exports.updateEvent = exports.unregisterUserForEvent = exports.registerUserForEvent = exports.getUpcomingEvents = exports.getEventsCalendar = exports.getEventById = exports.getAllEvents = exports.filterEvents = exports.eventSearch = exports.deleteEvent = exports.createEvent = void 0;
 const client_1 = require("@prisma/client");
 const joi_1 = __importDefault(require("joi"));
 const cloudinaryConfig_1 = __importDefault(require("../config/cloudinaryConfig"));
@@ -271,6 +271,7 @@ const registerUserForEvent = async (req, res) => {
     try {
         const userId = req.user.id;
         const eventId = req.params.eventId;
+        const numberOfTickets = req.body?.numberOfTickets;
         // Check if the event exists
         const event = await prisma.event.findUnique({
             where: { id: eventId },
@@ -290,7 +291,7 @@ const registerUserForEvent = async (req, res) => {
         });
         res.status(201).json({
             message: 'User registered for the event successfully',
-            data: registration,
+            data: { ...registration, numberOfTickets },
         });
     }
     catch (error) {
@@ -299,26 +300,66 @@ const registerUserForEvent = async (req, res) => {
     }
 };
 exports.registerUserForEvent = registerUserForEvent;
-const deleteEvent = async (req, res) => {
-    const requestSchema = joi_1.default.object({
-        eventId: joi_1.default.string().required(),
-    });
-    const { error } = requestSchema.validate(req.params);
-    if (error)
-        return res.status(400).json({ error: error.details[0].message });
-    const eventId = req.params.eventId;
-    const event = await prisma.event.findUnique({ where: { id: eventId } });
-    if (!event)
-        return res.status(404).json({ message: 'Event not found' });
-    // Delete event from database
-    await prisma.event.delete({ where: { id: eventId } });
-    // Delete image from cloudinary
-    if (event.image) {
-        // Extract the public ID from the image URL
-        const publicId = event.image.split('/v')[1].split('/')[1];
-        await cloudinaryConfig_1.default.uploader.destroy(publicId);
+const unregisterUserForEvent = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const eventId = req.params.eventId;
+        // Check if the event exists
+        const event = await prisma.event.findUnique({
+            where: { id: eventId },
+        });
+        if (!event)
+            return res.status(404).json({ error: 'Event not found' });
+        // Check if the user is registered for the event
+        const existingRegistration = await prisma.userEvent.findFirst({
+            where: { userId, eventId },
+        });
+        if (!existingRegistration) {
+            return res.status(400).json({ error: 'User is not registered for this event' });
+        }
+        // Delete the user's registration for the event
+        await prisma.userEvent.delete({
+            where: {
+                id: existingRegistration.id,
+            },
+        });
+        res.status(200).json({ message: 'Your registration for this event has been canceled successfully.' });
     }
-    res.status(200).json({ message: 'Event deleted successfully' });
+    catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Error canceling user registration for the event' });
+    }
+};
+exports.unregisterUserForEvent = unregisterUserForEvent;
+const deleteEvent = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const eventId = req.params?.eventId;
+        // Check if the event exists
+        const event = await prisma.event.findUnique({
+            where: { id: eventId },
+        });
+        if (!event) {
+            return res.status(404).json({ error: 'Event not found' });
+        }
+        // Check if the current user is the organizer of the event
+        if (event.organizerId !== userId) {
+            return res.status(403).json({ error: 'You do not have permission to delete this event' });
+        }
+        // Delete the event
+        await prisma.event.delete({
+            where: { id: eventId },
+        });
+        // Manually clean up UserEvent records associated with the event
+        await prisma.userEvent.deleteMany({
+            where: { eventId: eventId },
+        });
+        res.status(200).json({ message: 'Event deleted successfully' });
+    }
+    catch (error) {
+        console.error('Error deleting the event:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 };
 exports.deleteEvent = deleteEvent;
 //# sourceMappingURL=event.controller.js.map

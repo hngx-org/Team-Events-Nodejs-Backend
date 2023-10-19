@@ -356,6 +356,16 @@ const swaggerDocument = {
                         },
                     },
                 ],
+                requestBody: {
+                    content: {
+                        'application/json': {
+                            example: {
+                                numberOfTickets: 1,
+                            },
+                        },
+                    },
+                    required: true,
+                },
                 responses: {
                     201: {
                         description: 'User registered for the event successfully.',
@@ -377,6 +387,35 @@ const swaggerDocument = {
                     },
                     400: {
                         description: 'Bad request. User is already registered for the event.',
+                    },
+                    404: {
+                        description: 'Event not found.',
+                    },
+                    500: {
+                        description: 'Internal server error.',
+                    },
+                },
+            },
+        },
+        '/api/events/unregister/{eventId}': {
+            post: {
+                tags: ['Event'],
+                summary: 'Cancel User registration to an event',
+                // description: 'Cancel User registration to an event.',
+                parameters: [
+                    {
+                        name: 'eventId',
+                        in: 'path',
+                        required: true,
+                        description: 'The unique identifier of the event.',
+                        schema: {
+                            type: 'string',
+                        },
+                    },
+                ],
+                responses: {
+                    201: {
+                        description: 'Your event registration has been successfully canceled.',
                     },
                     404: {
                         description: 'Event not found.',
@@ -545,7 +584,7 @@ const swaggerDocument = {
         },
         '/api/user/settings': {
             get: {
-                tags: ['User Settings'],
+                tags: ['User'],
                 summary: 'Get User Preferences Settings',
                 description: 'This route is used to get a particular user preferences settings',
                 responses: {
@@ -561,7 +600,7 @@ const swaggerDocument = {
                 },
             },
             post: {
-                tag: ['Update User Settings'],
+                tags: ['User'],
                 summary: 'Update The User Preferences Settings',
                 description: 'This route is used to update a particular user preference',
                 responses: {
