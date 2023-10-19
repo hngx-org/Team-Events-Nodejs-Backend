@@ -12,6 +12,7 @@ import {
 	registerUserForEvent,
 	filterEvents,
 	unregisterUserForEvent,
+	getCreatedEvents
 } from '../Controllers/event.controller';
 import protect from '../middleware/auth.middleware';
 const router = Router();
@@ -27,6 +28,14 @@ router.post('/', upload.single('image'), protect, createEvent);
  * PROTECTED ROUTE
  */
 router.get('/', getAllEvents);
+
+/*@GET /events/created/:userId
+ * This route should take care of getting events created by a particular user
+ * NOT PROTECTED ROUTE
+ */
+
+router.get('/created/:userId', getCreatedEvents);
+
 
 /*@GET /events/upcoming
  * PROTECTED ROUTE
