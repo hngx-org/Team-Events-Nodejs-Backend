@@ -73,12 +73,7 @@ const changePassword = async (req: Request, res: Response) => {
 		const { error, value } = passwordSchema.validate(req.body);
 
 		if (error) {
-			res.status(400).json({
-				status: `error`,
-				message: `Password mismatch`,
-				success: false,
-				error: error.details[0].message,
-			});
+			return res.status(400).json({ error: error.details[0].message });
 		}
 
 		const user = await prisma.user.findUnique({
@@ -88,19 +83,14 @@ const changePassword = async (req: Request, res: Response) => {
 		});
 
 		if (!user) {
-			res.status(400).json({
-				status: `error`,
-				message: `user not found`,
-				success: false,
-			});
+			return res.status(400).json({ error: `user not found`, success: false });
 		}
 
 		const isPasswordMatch = await verifyPassword(value.currentPassword, user.password);
 
 		if (!isPasswordMatch) {
-			res.status(400).json({
-				status: `error`,
-				message: `Incorrect current password input`,
+			return res.status(400).json({
+				error: `Current password is incorrect`,
 				success: false,
 			});
 		}
@@ -117,7 +107,7 @@ const changePassword = async (req: Request, res: Response) => {
 		});
 
 		if (!updatedUser) {
-			res.status(400).json({
+			return res.status(400).json({
 				status: `error`,
 				message: `password failed to update`,
 				success: false,
@@ -160,12 +150,7 @@ const updateUserProfile = async (req: Request, res: Response) => {
 		const { error, value } = profileSchema.validate(req.body);
 
 		if (error) {
-			res.status(400).json({
-				status: `error`,
-				message: `missing input field`,
-				success: false,
-				error: error.details[0].message,
-			});
+			return res.status(400).json({ error: error.details[0].message });
 		}
 
 		const user = await prisma.user.findFirst({
@@ -173,14 +158,7 @@ const updateUserProfile = async (req: Request, res: Response) => {
 				email: email,
 			},
 		});
-
-		if (!user) {
-			res.status(400).json({
-				status: `error`,
-				message: `user not found`,
-				success: false,
-			});
-		}
+		if (!user) return res.status(400).json({ error: `User not found` });
 
 		let uploadedImage = '';
 		if (req.file) {
@@ -200,8 +178,7 @@ const updateUserProfile = async (req: Request, res: Response) => {
 		});
 
 		res.status(200).json({
-			status: `success`,
-			message: `user profile successfully updated`,
+			message: `Profile updated successfully `,
 			success: true,
 			data: {
 				id: updatedUser.id,
@@ -215,7 +192,6 @@ const updateUserProfile = async (req: Request, res: Response) => {
 	} catch (error) {
 		console.log(error);
 		res.status(500).json({
-			status: `error`,
 			message: `internet error`,
 			success: false,
 		});
