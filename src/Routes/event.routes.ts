@@ -9,7 +9,7 @@ import {
 	updateEvent,
 	getEventsCalendar,
 	getUpcomingEvents,
-	registerForEvent,
+	registerUserForEvent,
 	filterEvents,
 } from '../Controllers/event.controller';
 import protect from '../middleware/auth.middleware';
@@ -44,15 +44,15 @@ router.get('/calendar', protect, getEventsCalendar);
  */
 router.get('/filter', filterEvents);
 
+/*@GET /events/register/:eventId
+ * This route should take care of registering the user a particular event
+ */
+router.post('/register/:eventId', protect, registerUserForEvent);
+
 /*@GET /events/search?keyword=
  * This route should take care of the searching event by name
  */
 router.get('/search', eventSearch);
-
-/*@GET /events/eventId/register
- * This route should take care of registering the user a particular event
- */
-router.get('/:eventId/register', registerForEvent);
 
 /*@GET /events/eventId
  * This route should take care of getting a particular event

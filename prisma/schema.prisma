@@ -13,12 +13,14 @@ datasource db {
 model User {
   id String @id @default(uuid())
 
-  email    String  @unique
-  password String?
-  username String?
-  avatar   String?
-  phone_no String?
-  gender   String?
+  email     String  @unique
+  password  String?
+  username  String?
+  firstname String?
+  lastname  String?
+  avatar    String?
+  phone_no  String?
+  gender    String?
 
   auth_method       Auth
   auth_id           String?
@@ -45,26 +47,26 @@ model User {
 model Event {
   id String @id @default(uuid())
 
-  name               String
-  description        String
-  image              String?
-  startTime          DateTime
-  endTime            DateTime
-  startDate          DateTime
-  endDate            DateTime
-  tags               String[]
-  ticketPrice        Float
-  isPaidEvent        Boolean
-  location           String?
-  eventLink         String?
-  registrationClosingDate DateTime
+  name                     String
+  description              String
+  image                    String?
+  startTime                DateTime
+  endTime                  DateTime
+  startDate                DateTime
+  endDate                  DateTime
+  tags                     String[]
+  ticketPrice              Float
+  isPaidEvent              Boolean
+  eventType                String
+  location                 String?
+  eventLink                String?
+  registrationClosingDate  DateTime
   numberOfAvailableTickets Int
 
   organizerId String
   organizer   User   @relation(fields: [organizerId], references: [id])
 
   attendees UserEvent[]
-  userId    String?
 }
 
 // Many-to-many relationship between users and events for event registration

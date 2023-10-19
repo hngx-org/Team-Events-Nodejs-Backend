@@ -7,7 +7,6 @@
   - You are about to drop the column `event_end` on the `Event` table. All the data in the column will be lost.
   - You are about to drop the column `event_name` on the `Event` table. All the data in the column will be lost.
   - You are about to drop the column `event_start` on the `Event` table. All the data in the column will be lost.
-  - You are about to drop the column `location` on the `Event` table. All the data in the column will be lost.
   - You are about to drop the column `updated_at` on the `Event` table. All the data in the column will be lost.
   - You are about to drop the `Comment` table. If the table is not empty, all the data it contains will be lost.
   - You are about to drop the `EventGroup` table. If the table is not empty, all the data it contains will be lost.
@@ -18,13 +17,17 @@
   - Added the required column `endTime` to the `Event` table without a default value. This is not possible if the table is not empty.
   - Added the required column `isPaidEvent` to the `Event` table without a default value. This is not possible if the table is not empty.
   - Added the required column `name` to the `Event` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `numberOfAvailableTickets` to the `Event` table without a default value. This is not possible if the table is not empty.
   - Added the required column `organizerId` to the `Event` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `registrationClosed` to the `Event` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `registrationClosingDate` to the `Event` table without a default value. This is not possible if the table is not empty.
   - Added the required column `startDate` to the `Event` table without a default value. This is not possible if the table is not empty.
   - Added the required column `startTime` to the `Event` table without a default value. This is not possible if the table is not empty.
   - Added the required column `ticketPrice` to the `Event` table without a default value. This is not possible if the table is not empty.
 
 */
+-- AlterEnum
+ALTER TYPE "Auth" ADD VALUE 'basic';
+
 -- DropForeignKey
 ALTER TABLE "Comment" DROP CONSTRAINT "Comment_created_by_fkey";
 
@@ -56,21 +59,28 @@ DROP COLUMN "event_description",
 DROP COLUMN "event_end",
 DROP COLUMN "event_name",
 DROP COLUMN "event_start",
-DROP COLUMN "location",
 DROP COLUMN "updated_at",
 ADD COLUMN     "description" TEXT NOT NULL,
 ADD COLUMN     "endDate" TIMESTAMP(3) NOT NULL,
 ADD COLUMN     "endTime" TIMESTAMP(3) NOT NULL,
+ADD COLUMN     "eventLink" TEXT,
 ADD COLUMN     "isPaidEvent" BOOLEAN NOT NULL,
 ADD COLUMN     "name" TEXT NOT NULL,
+ADD COLUMN     "numberOfAvailableTickets" INTEGER NOT NULL,
 ADD COLUMN     "organizerId" TEXT NOT NULL,
-ADD COLUMN     "registrationClosed" TIMESTAMP(3) NOT NULL,
+ADD COLUMN     "registrationClosingDate" TIMESTAMP(3) NOT NULL,
 ADD COLUMN     "startDate" TIMESTAMP(3) NOT NULL,
 ADD COLUMN     "startTime" TIMESTAMP(3) NOT NULL,
 ADD COLUMN     "tags" TEXT[],
 ADD COLUMN     "ticketPrice" DOUBLE PRECISION NOT NULL,
 ADD COLUMN     "userId" TEXT,
 ALTER COLUMN "image" DROP NOT NULL;
+
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "firstname" TEXT,
+ADD COLUMN     "gender" TEXT,
+ADD COLUMN     "lastname" TEXT,
+ADD COLUMN     "phone_no" TEXT;
 
 -- DropTable
 DROP TABLE "Comment";

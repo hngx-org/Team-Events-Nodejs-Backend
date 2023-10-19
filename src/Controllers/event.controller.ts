@@ -15,9 +15,9 @@ const createEvent = async (req: Request, res: Response) => {
 			startTime: Joi.any().required(),
 			endDate: Joi.date().iso().required(),
 			endTime: Joi.any().required(),
-			location: Joi.string(),
 			tags: Joi.array().items(Joi.string()).required(),
 			isPaidEvent: Joi.boolean().required(),
+			location: Joi.string(),
 			eventLink: Joi.string(),
 			ticketPrice: Joi.number().when('isPaidEvent', {
 				is: false,
@@ -48,9 +48,10 @@ const createEvent = async (req: Request, res: Response) => {
 				endTime: value?.endTime,
 				startDate: value?.startDate,
 				endDate: value?.endDate,
-				tags:value?.tags,
-				location: value?.location,
+				tags: value?.tags,
 				isPaidEvent: value?.isPaidEvent,
+				eventType: value?.location ? 'Physical' : 'Virtual',
+				location: value?.location,
 				eventLink: value?.eventLink,
 				ticketPrice: value?.ticketPrice,
 				numberOfAvailableTickets: value?.numberOfAvailableTickets,
@@ -73,8 +74,6 @@ const createEvent = async (req: Request, res: Response) => {
 	}
 };
 
-
-// update event
 const updateEvent = async (req: Request, res: Response) => {
 	// try {
 	// 	const requestSchema = Joi.object({
@@ -113,12 +112,18 @@ const updateEvent = async (req: Request, res: Response) => {
 };
 
 const getAllEvents = async (req: Request, res: Response) => {
-	// Get all events
-	const events = await prisma.event.findMany();
-	if (events.length > 0) {
-		res.status(200).json(events);
-	} else {
-		res.status(404).json({ error: 'No events found' });
+	try {
+		const events = await prisma.event.findMany();
+
+		let message = 'Events retrieved successfully.';
+		if (!events.length) {
+			message = 'No events found';
+		}
+
+		res.status(200).json({ message, data: events });
+	} catch (error) {
+		console.error('Error:', error);
+		res.status(500).json({ error: 'Error fetching events' });
 	}
 };
 
@@ -134,20 +139,65 @@ const getEventsCalendar = async (req: Request, res: Response) => {
 
 const getUpcomingEvents = async (req: Request, res: Response) => {
 	try {
-		const userId = (req.user as User).id;
-		res.json({ error: 'No events found' });
+		const today = new Date();
+		const limit = parseInt(req.query.limit as string) || 12;
+
+		const upcomingEvents = await prisma.event.findMany({
+			where: {
+				startDate: { gte: today },
+			},
+			take: limit,
+		});
+
+		let message = 'Events retrieved successfully.';
+		if (!upcomingEvents.length) {
+			message = 'No events found';
+		}
+		res.status(200).json({ message, data: upcomingEvents });
 	} catch (error) {
-		console.error('Error fetching friend events:', error);
-		res.status(500).json({ error: 'Error fetching friend events' });
+		console.error('Error:', error);
+		res.status(500).json({ error: 'Error fetching events' });
 	}
 };
 
 const filterEvents = async (req: Request, res: Response) => {
-	const events = await prisma.event.findMany();
-	if (events.length > 0) {
-		res.status(200).json(events);
-	} else {
-		res.status(404).json({ error: 'No events found' });
+	try {
+		const dateString = req.query.date as string;
+		const eventPricing = req.query.eventPricing as string;
+
+		// Parse the date string into a Date object
+		const date = new Date(dateString);
+		if (isNaN(date.getTime())) {
+			return res.status(400).json({ error: 'Invalid date format' });
+		}
+
+		// Define a base query to retrieve events
+		let eventsQuery = prisma.event.findMany({
+			where: {
+				startDate: { gte: date },
+			},
+		});
+
+		// Execute the query and get the events as an array
+		const allEvents = await eventsQuery;
+
+		// Apply additional filters based on event pricing
+		let filteredEvents = allEvents;
+		if (eventPricing) {
+			if (eventPricing === 'Free') {
+				filteredEvents = allEvents.filter((event) => !event.isPaidEvent);
+			} else if (eventPricing === 'Paid') {
+				filteredEvents = allEvents.filter((event) => event.isPaidEvent);
+			}
+		}
+
+		res.status(200).json({
+			message: 'Events filtered successfully',
+			data: filteredEvents,
+		});
+	} catch (error) {
+		console.error('Error filtering events:', error);
+		res.status(500).json({ error: 'An error occurred while filtering events' });
 	}
 };
 
@@ -181,15 +231,7 @@ const eventSearch = async (req: Request, res: Response) => {
 			},
 		});
 
-		if (searchResults.length === 0) {
-			return res.status(404).json({
-				error: 'A match could not be  found',
-				message: 'No match was found',
-				statusCode: 404,
-			});
-		}
 		return res.status(200).json({
-			statusCode: 200,
 			message: 'successful',
 			data: searchResults,
 		});
@@ -230,11 +272,37 @@ const getEventById = async (req: Request, res: Response) => {
 	});
 };
 
-const registerForEvent = async (req: Request, res: Response) => {
+const registerUserForEvent = async (req: Request, res: Response) => {
 	try {
-		res.json({ error: 'Still in development' });
+		const userId = (req.user as User).id;
+		const eventId = req.params.eventId;
+
+		// Check if the event exists
+		const event = await prisma.event.findUnique({
+			where: { id: eventId },
+		});
+		if (!event) return res.status(404).json({ error: 'Event not found' });
+
+		// Check if the user is already registered for the event
+		const existingRegistration = await prisma.userEvent.findFirst({
+			where: { userId, eventId },
+		});
+		if (existingRegistration) {
+			return res.status(400).json({ error: 'You are already registered for this event' });
+		}
+
+		// Create a new user event registration
+		const registration = await prisma.userEvent.create({
+			data: { userId, eventId },
+		});
+
+		res.status(201).json({
+			message: 'User registered for the event successfully',
+			data: registration,
+		});
 	} catch (error) {
-		//
+		console.error('Error registering user for the event:', error);
+		res.status(500).json({ error: 'Internal server error' });
 	}
 };
 
@@ -269,6 +337,6 @@ export {
 	getEventById,
 	getEventsCalendar,
 	getUpcomingEvents,
-	registerForEvent,
+	registerUserForEvent,
 	updateEvent,
 };
