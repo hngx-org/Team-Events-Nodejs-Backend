@@ -324,6 +324,7 @@ const swaggerDocument = {
 				},
 			},
 		},
+
 		'/api/events/upcoming': {
 			get: {
 				tags: ['Event'],
@@ -341,8 +342,52 @@ const swaggerDocument = {
 					200: {
 						description: 'Friend events retrieved successfully.',
 					},
+				},
+			},
+		},
+		'/api/events/register/{eventId}': {
+			post: {
+				tags: ['Event'],
+				summary: 'Register a user for an event',
+				description: 'Allows a user to register for a specific event.',
+				parameters: [
+					{
+						name: 'eventId',
+						in: 'path',
+						required: true,
+						description: 'The unique identifier of the event.',
+						schema: {
+							type: 'string',
+						},
+					},
+				],
+				responses: {
+					201: {
+						description: 'User registered for the event successfully.',
+						content: {
+							'application/json': {
+								example: {
+									statusCode: 201,
+									message: 'User registered for the event successfully',
+									registration: {
+										id: 'a381ac82-7ce1-4aa7-a7b1-96d8e7a4b2cd',
+										userId: 'e92faa95-0843-4c3c-b5af-597d83da0b3f',
+										eventId: 'd9b6e600-5569-44f9-a6f2-51c32a8ea2a7',
+										createdAt: '2023-10-11T16:25:33.516Z',
+										updatedAt: '2023-10-11T16:25:33.516Z',
+									},
+								},
+							},
+						},
+					},
+					400: {
+						description: 'Bad request. User is already registered for the event.',
+					},
 					404: {
-						description: 'No friend events found.',
+						description: 'Event not found.',
+					},
+					500: {
+						description: 'Internal server error.',
 					},
 				},
 			},
@@ -351,7 +396,7 @@ const swaggerDocument = {
 			get: {
 				tags: ['Event'],
 				summary: 'Filter Events',
-				description: 'Filter events based on location, category, date, and event type.',
+				description: 'Filter events based on location, event pricing, date, and event type.',
 				parameters: [
 					{
 						name: 'location',
@@ -363,9 +408,9 @@ const swaggerDocument = {
 						},
 					},
 					{
-						name: 'category',
+						name: 'eventPricing',
 						in: 'query',
-						description: 'Category to filter events by.',
+						description: 'Pricing type to filter events by.',
 						required: false,
 						schema: {
 							type: 'string',
@@ -393,9 +438,6 @@ const swaggerDocument = {
 				responses: {
 					200: {
 						description: 'Filtered events fetched successfully',
-					},
-					400: {
-						description: 'Bad request. Invalid query parameters.',
 					},
 					500: {
 						description: 'Internal server error.',
