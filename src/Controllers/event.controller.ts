@@ -48,7 +48,7 @@ const createEvent = async (req: Request, res: Response) => {
 				endTime: value?.endTime,
 				startDate: value?.startDate,
 				endDate: value?.endDate,
-				tags:value?.tags,
+				tags: value?.tags,
 				location: value?.location,
 				isPaidEvent: value?.isPaidEvent,
 				eventLink: value?.eventLink,
@@ -73,8 +73,6 @@ const createEvent = async (req: Request, res: Response) => {
 	}
 };
 
-
-// update event
 const updateEvent = async (req: Request, res: Response) => {
 	// try {
 	// 	const requestSchema = Joi.object({
@@ -134,11 +132,20 @@ const getEventsCalendar = async (req: Request, res: Response) => {
 
 const getUpcomingEvents = async (req: Request, res: Response) => {
 	try {
-		const userId = (req.user as User).id;
-		res.json({ error: 'No events found' });
+		const today = new Date();
+		const limit = parseInt(req.query.limit as string) || 12;
+
+		const upcomingEvents = await prisma.event.findMany({
+			where: {
+				startDate: { gte: today },
+			},
+			take: limit,
+		});
+
+		res.json({ message: 'No events found', data: upcomingEvents });
 	} catch (error) {
-		console.error('Error fetching friend events:', error);
-		res.status(500).json({ error: 'Error fetching friend events' });
+		console.error('Error:', error);
+		res.status(500).json({ error: 'Error fetching events' });
 	}
 };
 
