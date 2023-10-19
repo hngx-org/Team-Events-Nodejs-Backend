@@ -276,6 +276,7 @@ const registerUserForEvent = async (req: Request, res: Response) => {
 	try {
 		const userId = (req.user as User).id;
 		const eventId = req.params.eventId;
+		const numberOfTickets = req.body?.numberOfTickets;
 
 		// Check if the event exists
 		const event = await prisma.event.findUnique({
@@ -298,11 +299,45 @@ const registerUserForEvent = async (req: Request, res: Response) => {
 
 		res.status(201).json({
 			message: 'User registered for the event successfully',
-			data: registration,
+			data: { ...registration, numberOfTickets },
 		});
 	} catch (error) {
 		console.error('Error registering user for the event:', error);
 		res.status(500).json({ error: 'Internal server error' });
+	}
+};
+
+const unregisterUserForEvent = async (req: Request, res: Response) => {
+	try {
+		const userId = (req.user as User).id;
+		const eventId = req.params.eventId;
+
+		// Check if the event exists
+		const event = await prisma.event.findUnique({
+			where: { id: eventId },
+		});
+		if (!event) return res.status(404).json({ error: 'Event not found' });
+
+		// Check if the user is registered for the event
+		const existingRegistration = await prisma.userEvent.findFirst({
+			where: { userId, eventId },
+		});
+
+		if (!existingRegistration) {
+			return res.status(400).json({ error: 'User is not registered for this event' });
+		}
+
+		// Delete the user's registration for the event
+		await prisma.userEvent.delete({
+			where: {
+				id: existingRegistration.id,
+			},
+		});
+
+		res.status(200).json({ message: 'Your registration for this event has been canceled successfully.' });
+	} catch (error) {
+		console.error('Error:', error);
+		res.status(500).json({ error: 'Error canceling user registration for the event' });
 	}
 };
 
@@ -338,5 +373,6 @@ export {
 	getEventsCalendar,
 	getUpcomingEvents,
 	registerUserForEvent,
+	unregisterUserForEvent,
 	updateEvent,
 };
