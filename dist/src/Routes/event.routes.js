@@ -18,11 +18,10 @@ router.post('/', multer_cloudinary_config_1.default.single('image'), auth_middle
  * PROTECTED ROUTE
  */
 router.get('/', event_controller_1.getAllEvents);
-/*@GET /events/friends
- * This route should take care of getting all events of members of shared groups
+/*@GET /events/upcoming
  * PROTECTED ROUTE
  */
-router.get('/friends', auth_middleware_1.default, event_controller_1.getFriendEvent);
+router.get('/upcoming', event_controller_1.getUpcomingEvents);
 /*@GET /events/calendar
  * This route should take care of getting all events (calendar)
  * PROTECTED ROUTE
@@ -33,14 +32,18 @@ router.get('/calendar', auth_middleware_1.default, event_controller_1.getEventsC
  * PROTECTED ROUTE
  */
 router.get('/filter', event_controller_1.filterEvents);
+/*@GET /events/register/:eventId
+ * This route should take care of registering the user a particular event
+ */
+router.post('/register/:eventId', auth_middleware_1.default, event_controller_1.registerUserForEvent);
 /*@GET /events/search?keyword=
  * This route should take care of the searching event by name
  */
 router.get('/search', event_controller_1.eventSearch);
-/*@GET /events/info/eventId
+/*@GET /events/eventId
  * This route should take care of getting a particular event
  */
-router.get('/info/:eventId', event_controller_1.getEventById);
+router.get('/:eventId', event_controller_1.getEventById);
 /*@PUT /events/:id
  * This route should take care of updating events should return a 201
  * PROTECTED ROUTE

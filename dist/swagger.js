@@ -223,11 +223,175 @@ const swaggerDocument = {
                 },
             },
         },
+        '/api/events': {
+            post: {
+                tags: ['Event'],
+                summary: 'Create Event',
+                description: 'Create a new event with optional image upload.',
+                requestBody: {
+                    content: {
+                        'multipart/form-data': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    name: { type: 'string' },
+                                    description: { type: 'string' },
+                                    startDate: { type: 'string', format: 'date-time' },
+                                    startTime: { type: 'string' },
+                                    endDate: { type: 'string', format: 'date-time' },
+                                    endTime: { type: 'string' },
+                                    location: { type: 'string' },
+                                    tags: { type: 'array', items: { type: 'string' } },
+                                    isPaidEvent: { type: 'boolean' },
+                                    eventLink: { type: 'string' },
+                                    ticketPrice: { type: 'number' },
+                                    numberOfAvailableTickets: { type: 'integer' },
+                                    registrationClosingDate: { type: 'string', format: 'date-time' },
+                                    // Add an image field here if needed
+                                },
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    201: {
+                        description: 'Event created successfully.',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        statusCode: { type: 'integer', example: 201 },
+                                        message: { type: 'string', example: 'Event created successfully' },
+                                        data: {
+                                            type: 'object',
+                                            properties: {
+                                                // Define the structure of the returned event object
+                                                id: { type: 'string' },
+                                                name: { type: 'string' },
+                                                description: { type: 'string' },
+                                                // Include other event properties here
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    400: {
+                        description: 'Bad Request - Validation error.',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        error: { type: 'string' },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    500: {
+                        description: 'Internal Server Error - Event creation error.',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        error: { type: 'string' },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            get: {
+                tags: ['Event'],
+                summary: 'Get All Events',
+                description: 'This route is used to get all events created by all users.',
+                responses: {
+                    200: {
+                        description: 'Events retrieved successfully.',
+                    },
+                    404: {
+                        description: 'No events found.',
+                    },
+                },
+            },
+        },
+        '/api/events/upcoming': {
+            get: {
+                tags: ['Event'],
+                summary: 'Get upcoming Events',
+                // description: 'This route is used to get all events of members of shared groups.',
+                parameters: [
+                    {
+                        name: 'limit',
+                        in: 'query',
+                        required: false,
+                        type: 'string',
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: 'Friend events retrieved successfully.',
+                    },
+                },
+            },
+        },
+        '/api/events/register/{eventId}': {
+            post: {
+                tags: ['Event'],
+                summary: 'Register a user for an event',
+                description: 'Allows a user to register for a specific event.',
+                parameters: [
+                    {
+                        name: 'eventId',
+                        in: 'path',
+                        required: true,
+                        description: 'The unique identifier of the event.',
+                        schema: {
+                            type: 'string',
+                        },
+                    },
+                ],
+                responses: {
+                    201: {
+                        description: 'User registered for the event successfully.',
+                        content: {
+                            'application/json': {
+                                example: {
+                                    statusCode: 201,
+                                    message: 'User registered for the event successfully',
+                                    registration: {
+                                        id: 'a381ac82-7ce1-4aa7-a7b1-96d8e7a4b2cd',
+                                        userId: 'e92faa95-0843-4c3c-b5af-597d83da0b3f',
+                                        eventId: 'd9b6e600-5569-44f9-a6f2-51c32a8ea2a7',
+                                        createdAt: '2023-10-11T16:25:33.516Z',
+                                        updatedAt: '2023-10-11T16:25:33.516Z',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    400: {
+                        description: 'Bad request. User is already registered for the event.',
+                    },
+                    404: {
+                        description: 'Event not found.',
+                    },
+                    500: {
+                        description: 'Internal server error.',
+                    },
+                },
+            },
+        },
         '/api/events/filter': {
             get: {
                 tags: ['Event'],
                 summary: 'Filter Events',
-                description: 'Filter events based on location, category, date, and event type.',
+                description: 'Filter events based on location, event pricing, date, and event type.',
                 parameters: [
                     {
                         name: 'location',
@@ -239,9 +403,9 @@ const swaggerDocument = {
                         },
                     },
                     {
-                        name: 'category',
+                        name: 'eventPricing',
                         in: 'query',
-                        description: 'Category to filter events by.',
+                        description: 'Pricing type to filter events by.',
                         required: false,
                         schema: {
                             type: 'string',
@@ -269,9 +433,6 @@ const swaggerDocument = {
                 responses: {
                     200: {
                         description: 'Filtered events fetched successfully',
-                    },
-                    400: {
-                        description: 'Bad request. Invalid query parameters.',
                     },
                     500: {
                         description: 'Internal server error.',
@@ -302,49 +463,6 @@ const swaggerDocument = {
                 },
             },
         },
-        '/api/events': {
-            post: {
-                tags: ['Event'],
-                summary: 'Create Event',
-                description: 'This route is used to create an event.',
-                responses: {
-                    201: {
-                        description: 'Event created successfully.',
-                    },
-                    500: {
-                        description: 'Event creation error.',
-                    },
-                },
-            },
-            get: {
-                tags: ['Event'],
-                summary: 'Get All Events',
-                description: 'This route is used to get all events created by all users.',
-                responses: {
-                    200: {
-                        description: 'Events retrieved successfully.',
-                    },
-                    404: {
-                        description: 'No events found.',
-                    },
-                },
-            },
-        },
-        '/api/events/friends': {
-            get: {
-                tags: ['Event'],
-                summary: 'Get Friend Events',
-                description: 'This route is used to get all events of members of shared groups.',
-                responses: {
-                    200: {
-                        description: 'Friend events retrieved successfully.',
-                    },
-                    404: {
-                        description: 'No friend events found.',
-                    },
-                },
-            },
-        },
         '/api/events/calendar': {
             get: {
                 tags: ['Event'],
@@ -360,7 +478,7 @@ const swaggerDocument = {
                 },
             },
         },
-        '/api/events/info/{eventId}': {
+        '/api/events/{eventId}': {
             get: {
                 tags: ['Event'],
                 summary: 'Get Event by ID',
@@ -382,8 +500,6 @@ const swaggerDocument = {
                     },
                 },
             },
-        },
-        '/api/events/{eventId}': {
             put: {
                 tags: ['Event'],
                 summary: 'Update Event',
@@ -423,165 +539,6 @@ const swaggerDocument = {
                     },
                     404: {
                         description: 'Event not found.',
-                    },
-                },
-            },
-        },
-        '/api/comments/{eventId}': {
-            post: {
-                tags: ['Comment'],
-                summary: 'Create Comment',
-                description: 'This route is used to create a comment.',
-                parameters: [
-                    {
-                        name: 'eventId',
-                        in: 'path',
-                        required: true,
-                        type: 'string',
-                    },
-                ],
-                requestBody: {
-                    required: true,
-                    content: {
-                        'application/json': {
-                            schema: {
-                                type: 'object',
-                                properties: {
-                                    comment: {
-                                        type: 'string',
-                                    },
-                                },
-                            },
-                            example: {
-                                comment: 'Nice. I will be there.',
-                            },
-                        },
-                    },
-                },
-                responses: {
-                    201: {
-                        description: 'Comment created successfully.',
-                    },
-                    500: {
-                        description: 'Error creating comment.',
-                    },
-                },
-            },
-            get: {
-                tags: ['Comment'],
-                summary: 'Get Comments',
-                description: 'This route is used to get comments.',
-                parameters: [
-                    {
-                        name: 'eventId',
-                        in: 'path',
-                        required: true,
-                        type: 'string',
-                    },
-                ],
-                responses: {
-                    201: {
-                        description: 'Comments retrieved successfully.',
-                    },
-                    404: {
-                        description: 'No comments found for this event.',
-                    },
-                },
-            },
-        },
-        '/api/groups': {
-            post: {
-                tags: ['Groups'],
-                summary: 'Create Group',
-                description: 'This route is used to create groups (no page on the design for this, but just use the information in the table)',
-                responses: {
-                    201: {
-                        description: 'Group created successfully.',
-                    },
-                    500: {
-                        description: 'Group creation error.',
-                    },
-                },
-            },
-            get: {
-                tags: ['Groups'],
-                summary: 'Get User Groups',
-                description: 'This route is used to get all groups that a user is a part of.',
-                responses: {
-                    200: {
-                        description: 'User group fetched successfully.',
-                    },
-                    404: {
-                        description: 'User not found.',
-                    },
-                },
-            },
-        },
-        '/api/groups/{groupId}/addUser': {
-            post: {
-                tags: ['Groups'],
-                summary: 'Add user to group',
-                description: 'This route is used add a user to a group using the user email address.',
-                parameters: [
-                    {
-                        name: 'groupId',
-                        in: 'path',
-                        required: true,
-                        type: 'string',
-                    },
-                ],
-                responses: {
-                    201: {
-                        description: 'User added successfully.',
-                    },
-                    500: {
-                        description: 'Error adding user.',
-                    },
-                },
-            },
-        },
-        '/api/groups/info/{groupId}': {
-            get: {
-                tags: ['Groups'],
-                summary: 'Get Group by ID',
-                description: 'This route is used to get a particular group by its ID.',
-                parameters: [
-                    {
-                        name: 'groupId',
-                        in: 'path',
-                        required: true,
-                        type: 'string',
-                    },
-                ],
-                responses: {
-                    200: {
-                        description: 'Group retrieved successfully.',
-                    },
-                    404: {
-                        description: 'Group not found.',
-                    },
-                },
-            },
-        },
-        '/api/groups/events/{groupId}': {
-            get: {
-                tags: ['Groups'],
-                summary: 'Get Events in Group',
-                description: 'This route is used to get all events under a specific group.',
-                parameters: [
-                    {
-                        name: 'groupId',
-                        in: 'path',
-                        required: true,
-                        type: 'string',
-                    },
-                ],
-                responses: {
-                    200: {
-                        description: 'Events retrieved successfully.',
-                    },
-                    404: {
-                        description: 'No events found for this group.',
                     },
                 },
             },
