@@ -13,10 +13,14 @@ datasource db {
 model User {
   id String @id @default(uuid())
 
-  email    String  @unique
-  password String?
-  username String?
-  avatar   String?
+  email     String  @unique
+  password  String?
+  username  String?
+  firstname String?
+  lastname  String?
+  avatar    String?
+  phone_no  String?
+  gender    String?
 
   auth_method       Auth
   auth_id           String?
@@ -30,86 +34,57 @@ model User {
   reset_password_token   String?
   reset_password_expires DateTime?
 
-  event      Event[]
-  group      Group[]
-  comment    Comment[]
-  user_group UserGroup[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt()
 
-  created_at     DateTime         @default(now())
-  updated_at     DateTime         @updatedAt()
+  event      Event[]
+  user_event UserEvent[]
+
   UserPreference UserPreference[]
 }
 
+// Define the Event model
 model Event {
   id String @id @default(uuid())
 
-  event_name        String
-  event_description String
-  image             String
-  event_start       DateTime
-  event_end         DateTime
-  location          String?
-  created_by        String
+  name                     String
+  description              String
+  image                    String?
+  startTime                DateTime
+  endTime                  DateTime
+  startDate                DateTime
+  endDate                  DateTime
+  tags                     String[]
+  ticketPrice              Float
+  isPaidEvent              Boolean
+  eventType                String
+  location                 String?
+  eventLink                String?
+  registrationClosingDate  DateTime
+  numberOfAvailableTickets Int
 
-  comment     Comment[]
-  event_group EventGroup[]
-  user        User         @relation(fields: [created_by], references: [id], onDelete: Cascade)
+  organizerId String
+  organizer   User   @relation(fields: [organizerId], references: [id])
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt()
+  attendees UserEvent[]
 }
 
-model Group {
+// Many-to-many relationship between users and events for event registration
+model UserEvent {
   id String @id @default(uuid())
 
-  group_name  String
-  created_by  String
-  image       String?
-  user_groups UserGroup[]
-  event_group EventGroup[]
-  user        User         @relation(fields: [created_by], references: [id])
+  userId  String
+  eventId String
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt()
-}
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-model Comment {
-  id String @id @default(uuid())
-
-  event_id   String
-  created_by String
-  comment    String
-
-  event Event @relation(fields: [event_id], references: [id])
-  user  User  @relation(fields: [created_by], references: [id])
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt()
-}
-
-model UserGroup {
-  id String @id @default(uuid())
-
-  user_id  String
-  group_id String
-
-  user  User  @relation(fields: [user_id], references: [id])
-  group Group @relation(fields: [group_id], references: [id])
-}
-
-model EventGroup {
-  id String @id @default(uuid())
-
-  group_id String
-  event_id String
-
-  group Group @relation(fields: [group_id], references: [id])
-  event Event @relation(fields: [event_id], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+  Event Event @relation(fields: [eventId], references: [id])
 }
 
 model UserPreference {
-  id String @id @default(uuid())
-
+  id      String @id @default(uuid())
   user_id String
 
   event_update             Boolean?
