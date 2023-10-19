@@ -75,40 +75,82 @@ const createEvent = async (req: Request, res: Response) => {
 };
 
 const updateEvent = async (req: Request, res: Response) => {
-	// try {
-	// 	const requestSchema = Joi.object({
-	// 		event_name: Joi.string(),
-	// 		event_description: Joi.string(),
-	// 		event_start: Joi.date().iso(),
-	// 		event_end: Joi.date().iso(),
-	// 		location: Joi.string(),
-	// 	});
-	// 	const { error } = requestSchema.validate(req.body);
-	// 	if (error) return res.status(400).json({ error: error.details[0].message });
-	// 	const { event_name, event_description, event_start, event_end, location } = req.body;
-	// 	const { secure_url } = await cloudinary.uploader.upload(req.file.path);
-	// 	const updateEvent: Event = await prisma.event.update({
-	// 		where: {
-	// 			id: req.params.eventId,
-	// 		},
-	// 		data: {
-	// 			event_name,
-	// 			event_description,
-	// 			image: secure_url,
-	// 			event_start,
-	// 			event_end,
-	// 			location,
-	// 		},
-	// 	});
-	// 	res.status(201).json({
-	// 		statusCode: 201,
-	// 		message: 'Event updated successfully',
-	// 		data: updateEvent,
-	// 	});
-	// } catch (error) {
-	// 	console.error('Error creating event:', error);
-	// 	res.status(500).json({ error: 'Error updating event' });
-	// }
+	try {
+		const requestSchema = Joi.object({
+			eventId: Joi.string().required(),
+		});
+		const { error: requestSchemaError, value: requestSchemaValue } = requestSchema.validate(req.params);
+
+		if (requestSchemaError) return res.status(400).json({ error: requestSchemaError.details[0].message });
+
+		const { eventId } = requestSchemaValue;
+
+
+		const updateSchema = Joi.object({
+			name: Joi.string(),
+			description: Joi.string(),
+			startDate: Joi.date().iso(),
+			startTime: Joi.any(),
+			endDate: Joi.date().iso(),
+			endTime: Joi.any(),
+			tags: Joi.array().items(Joi.string()),
+			isPaidEvent: Joi.boolean(),
+			location: Joi.string(),
+			eventLink: Joi.string(),
+			ticketPrice: Joi.number().when('isPaidEvent', {
+				is: false,
+				then: Joi.number().valid(0.0),
+				otherwise: Joi.number(),
+			}),
+			numberOfAvailableTickets: Joi.number(),
+			registrationClosingDate: Joi.date().iso(),
+		});
+
+		const { error, value } = updateSchema.validate(req.body);
+		if (error) return res.status(400).json({ error: error.details[0].message });
+
+		// Fetch the existing event by ID
+		const existingEvent = await prisma.event.findUnique({
+			where: {
+				id: eventId,
+			},
+		});
+
+		if (!existingEvent) {
+			return res.status(404).json({ error: 'Event not found' });
+		}
+
+		const updatedEvent = await prisma.event.update({
+			where: {
+				id: eventId,
+			},
+			data: {
+				name: value?.name || existingEvent.name,
+				description: value?.description || existingEvent.description,
+				startDate: value?.startDate || existingEvent.startDate,
+				startTime: value?.startTime || existingEvent.startTime,
+				endDate: value?.endDate || existingEvent.endDate,
+				endTime: value?.endTime || existingEvent.endTime,
+				tags: value?.tags || existingEvent.tags,
+				isPaidEvent: value?.isPaidEvent || existingEvent.isPaidEvent,
+				location: value?.location || existingEvent.location,
+				eventLink: value?.eventLink || existingEvent.eventLink,
+				eventType: value?.location ? 'Physical' : 'Virtual',
+				ticketPrice: value?.ticketPrice || existingEvent.ticketPrice,
+				numberOfAvailableTickets: value?.numberOfAvailableTickets || existingEvent.numberOfAvailableTickets,
+				registrationClosingDate: value?.registrationClosingDate || existingEvent.registrationClosingDate,
+			},
+		});
+
+		res.status(200).json({
+			statusCode: 200,
+			message: 'Event updated successfully',
+			data: updatedEvent,
+		});
+	} catch (error) {
+		console.error('Error updating event:', error);
+		res.status(500).json({ error: 'Error updating event' });
+	}
 };
 
 const getAllEvents = async (req: Request, res: Response) => {
