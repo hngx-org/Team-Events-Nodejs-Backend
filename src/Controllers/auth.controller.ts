@@ -1,12 +1,12 @@
 import { PrismaClient } from '@prisma/client';
-import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import transporter from './../config/mail.config';
+import { randomUUID } from 'crypto';
+import { Request, Response } from 'express';
 import Joi from 'joi';
 import passport from 'passport';
 import { authUrl, google, oauth2Client } from '../config/google.config';
 import { generateToken, hashPassword, sendVerificationEmail } from '../utils';
-import { randomUUID } from 'crypto';
+import transporter from './../config/mail.config';
 
 const prisma = new PrismaClient();
 
@@ -350,5 +350,6 @@ export {
 	resetPassword,
 	twitterAuth,
 	twitterAuthCallback,
-	verifyEmail,
+	verifyEmail
 };
+

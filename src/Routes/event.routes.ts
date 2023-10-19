@@ -12,6 +12,7 @@ import {
 	registerUserForEvent,
 	filterEvents,
 	unregisterUserForEvent,
+	getCreatedEvents,
 } from '../Controllers/event.controller';
 import protect from '../middleware/auth.middleware';
 const router = Router();
@@ -54,6 +55,12 @@ router.post('/register/:eventId', protect, registerUserForEvent);
  * This route should: Cancel user Registration to an event
  */
 router.post('/unregister/:eventId', protect, unregisterUserForEvent);
+
+/*@GET /events/created
+ * This route should take care of getting events created by a particular user
+ * NOT PROTECTED ROUTE
+ */
+router.get('/created', protect, getCreatedEvents);
 
 /*@GET /events/search?keyword=
  * This route should take care of the searching event by name
