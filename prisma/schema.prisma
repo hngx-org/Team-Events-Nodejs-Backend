@@ -57,6 +57,7 @@ model Event {
   tags                     String[]
   ticketPrice              Float
   isPaidEvent              Boolean
+  eventType                String
   location                 String?
   eventLink                String?
   registrationClosingDate  DateTime
@@ -66,7 +67,6 @@ model Event {
   organizer   User   @relation(fields: [organizerId], references: [id])
 
   attendees UserEvent[]
-  userId    String?
 }
 
 // Many-to-many relationship between users and events for event registration
