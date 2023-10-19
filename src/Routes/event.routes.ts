@@ -11,6 +11,7 @@ import {
 	getUpcomingEvents,
 	registerUserForEvent,
 	filterEvents,
+	unregisterUserForEvent,
 } from '../Controllers/event.controller';
 import protect from '../middleware/auth.middleware';
 const router = Router();
@@ -48,6 +49,11 @@ router.get('/filter', filterEvents);
  * This route should take care of registering the user a particular event
  */
 router.post('/register/:eventId', protect, registerUserForEvent);
+
+/*@GET /events/unregister/:eventId
+ * This route should: Cancel user Registration to an event
+ */
+router.post('/unregister/:eventId', protect, unregisterUserForEvent);
 
 /*@GET /events/search?keyword=
  * This route should take care of the searching event by name
