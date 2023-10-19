@@ -1,7 +1,12 @@
 import { Router } from 'express';
 import protect from '../middleware/auth.middleware';
 import upload from '../config/multer-cloudinary-config';
-import { changePassword, getUserPreference, updateUserPreference, updateUserProfile } from '../Controllers/user.controller';
+import {
+	changePassword,
+	getUserPreference,
+	updateUserPreference,
+	updateUserProfile,
+} from '../Controllers/user.controller';
 const router = Router();
 
 /*@GET /user/
@@ -9,20 +14,19 @@ const router = Router();
  */
 router.get('/settings', protect, getUserPreference);
 
-/*@POST /groups
+/*@POST /user
  * This route should
  */
 router.post('/settings', protect, updateUserPreference);
 
-/*@PATCH /groups
+/*@POST /user
  * This route should
  */
-router.patch('/change-password', protect, changePassword)
+router.put('/update-profile', upload.single('avatar'), protect, updateUserProfile);
 
-/*@PATCH /groups
+/*@POST /user
  * This route should
  */
-router.patch('/update-profile',  upload.single('image'), protect, updateUserProfile);
-
+router.patch('/change-password', protect, changePassword);
 
 export default router;

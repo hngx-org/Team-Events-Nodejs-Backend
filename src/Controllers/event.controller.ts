@@ -85,7 +85,6 @@ const updateEvent = async (req: Request, res: Response) => {
 
 		const { eventId } = requestSchemaValue;
 
-
 		const updateSchema = Joi.object({
 			name: Joi.string(),
 			description: Joi.string(),
@@ -171,14 +170,7 @@ const getAllEvents = async (req: Request, res: Response) => {
 
 const getCreatedEvents = async (req: Request, res: Response) => {
 	try {
-		const requestSchema = Joi.object({
-			userId: Joi.string().required(),
-		});
-
-		const { error, value } = requestSchema.validate(req.params);
-		if (error) return res.status(400).json({ error: error.details[0].message });
-
-		const { userId } = value;
+		const userId = (req.user as User).id;
 
 		const userEvents = await prisma.user.findUnique({
 			where: {
