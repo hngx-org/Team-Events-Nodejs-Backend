@@ -592,7 +592,7 @@ const swaggerDocument = {
 
 		'/api/user/settings': {
 			get: {
-				tags: ['User Settings'],
+				tags: ['User'],
 				summary: 'Get User Preferences Settings',
 				description: 'This route is used to get a particular user preferences settings',
 				responses: {
@@ -609,7 +609,7 @@ const swaggerDocument = {
 			},
 
 			post: {
-				tag: ['Update User Settings'],
+				tags: ['User'],
 				summary: 'Update The User Preferences Settings',
 				description: 'This route is used to update a particular user preference',
 				responses: {
