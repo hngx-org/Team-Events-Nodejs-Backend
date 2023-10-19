@@ -408,307 +408,339 @@ const swaggerDocument = {
 					},
 				},
 			},
-		},
+	
 
-		'/api/events/upcoming': {
-			get: {
-				tags: ['Event'],
-				summary: 'Get upcoming Events',
-				// description: 'This route is used to get all events of members of shared groups.',
-				parameters: [
-					{
-						name: 'limit',
-						in: 'query',
-						required: false,
-						type: 'string',
-					},
-				],
-				responses: {
-					200: {
-						description: 'Friend events retrieved successfully.',
+			'/api/events/created': {
+				get: {
+					tags: ['Event'],
+					summary: "Get all events created by a user",
+					description: "This endpoint would get all the events created by a particular user.",
+					parameters: [
+						{
+							name: "eventId",
+							in: "path",
+							required: true,
+							type: "string",
+							description: "This parameter is the userId, the id accociated with that particular user."
+
+						}
+					],
+					response: {
+						200: {
+							description: 'User events retrieved successfully'
+						},
+
+						404: {
+							description: 'User not found'
+						},
+
+						500: {
+							description: 'Error getting user events'
+						}
+					}
+				}
+			},
+
+			'/api/events/upcoming': {
+				get: {
+					tags: ['Event'],
+					summary: 'Get upcoming Events',
+					// description: 'This route is used to get all events of members of shared groups.',
+					parameters: [
+						{
+							name: 'limit',
+							in: 'query',
+							required: false,
+							type: 'string',
+						},
+					],
+					responses: {
+						200: {
+							description: 'Friend events retrieved successfully.',
+						},
 					},
 				},
 			},
-		},
-		'/api/events/register/{eventId}': {
-			post: {
-				tags: ['Event'],
-				summary: 'Register a user for an event',
-				description: 'Allows a user to register for a specific event.',
-				parameters: [
-					{
-						name: 'eventId',
-						in: 'path',
-						required: true,
-						description: 'The unique identifier of the event.',
-						schema: {
-							type: 'string',
-						},
-					},
-				],
-				requestBody: {
-					content: {
-						'application/json': {
-							example: {
-								numberOfTickets: 1,
+			'/api/events/register/{eventId}': {
+				post: {
+					tags: ['Event'],
+					summary: 'Register a user for an event',
+					description: 'Allows a user to register for a specific event.',
+					parameters: [
+						{
+							name: 'eventId',
+							in: 'path',
+							required: true,
+							description: 'The unique identifier of the event.',
+							schema: {
+								type: 'string',
 							},
 						},
-					},
-					required: true,
-				},
-				responses: {
-					201: {
-						description: 'User registered for the event successfully.',
+					],
+					requestBody: {
 						content: {
 							'application/json': {
 								example: {
-									statusCode: 201,
-									message: 'User registered for the event successfully',
-									registration: {
-										id: 'a381ac82-7ce1-4aa7-a7b1-96d8e7a4b2cd',
-										userId: 'e92faa95-0843-4c3c-b5af-597d83da0b3f',
-										eventId: 'd9b6e600-5569-44f9-a6f2-51c32a8ea2a7',
-										createdAt: '2023-10-11T16:25:33.516Z',
-										updatedAt: '2023-10-11T16:25:33.516Z',
+									numberOfTickets: 1,
+								},
+							},
+						},
+						required: true,
+					},
+					responses: {
+						201: {
+							description: 'User registered for the event successfully.',
+							content: {
+								'application/json': {
+									example: {
+										statusCode: 201,
+										message: 'User registered for the event successfully',
+										registration: {
+											id: 'a381ac82-7ce1-4aa7-a7b1-96d8e7a4b2cd',
+											userId: 'e92faa95-0843-4c3c-b5af-597d83da0b3f',
+											eventId: 'd9b6e600-5569-44f9-a6f2-51c32a8ea2a7',
+											createdAt: '2023-10-11T16:25:33.516Z',
+											updatedAt: '2023-10-11T16:25:33.516Z',
+										},
 									},
 								},
 							},
 						},
-					},
-					400: {
-						description: 'Bad request. User is already registered for the event.',
-					},
-					404: {
-						description: 'Event not found.',
-					},
-					500: {
-						description: 'Internal server error.',
-					},
-				},
-			},
-		},
-		'/api/events/unregister/{eventId}': {
-			post: {
-				tags: ['Event'],
-				summary: 'Cancel User registration to an event',
-				// description: 'Cancel User registration to an event.',
-				parameters: [
-					{
-						name: 'eventId',
-						in: 'path',
-						required: true,
-						description: 'The unique identifier of the event.',
-						schema: {
-							type: 'string',
+						400: {
+							description: 'Bad request. User is already registered for the event.',
+						},
+						404: {
+							description: 'Event not found.',
+						},
+						500: {
+							description: 'Internal server error.',
 						},
 					},
-				],
-				responses: {
-					201: {
-						description: 'Your event registration has been successfully canceled.',
-					},
-					404: {
-						description: 'Event not found.',
-					},
-					500: {
-						description: 'Internal server error.',
-					},
 				},
 			},
-		},
-		'/api/events/filter': {
-			get: {
-				tags: ['Event'],
-				summary: 'Filter Events',
-				description: 'Filter events based on location, event pricing, date, and event type.',
-				parameters: [
-					{
-						name: 'location',
-						in: 'query',
-						description: 'Location to filter events by.',
-						required: false,
-						schema: {
-							type: 'string',
+			'/api/events/unregister/{eventId}': {
+				post: {
+					tags: ['Event'],
+					summary: 'Cancel User registration to an event',
+					// description: 'Cancel User registration to an event.',
+					parameters: [
+						{
+							name: 'eventId',
+							in: 'path',
+							required: true,
+							description: 'The unique identifier of the event.',
+							schema: {
+								type: 'string',
+							},
+						},
+					],
+					responses: {
+						201: {
+							description: 'Your event registration has been successfully canceled.',
+						},
+						404: {
+							description: 'Event not found.',
+						},
+						500: {
+							description: 'Internal server error.',
 						},
 					},
-					{
-						name: 'eventPricing',
-						in: 'query',
-						description: 'Pricing type to filter events by.',
-						required: false,
-						schema: {
-							type: 'string',
+				},
+			},
+			'/api/events/filter': {
+				get: {
+					tags: ['Event'],
+					summary: 'Filter Events',
+					description: 'Filter events based on location, event pricing, date, and event type.',
+					parameters: [
+						{
+							name: 'location',
+							in: 'query',
+							description: 'Location to filter events by.',
+							required: false,
+							schema: {
+								type: 'string',
+							},
 						},
-					},
-					{
-						name: 'date',
-						in: 'query',
-						description: 'Date to filter events by (e.g., YYYY-MM-DD).',
-						required: false,
-						schema: {
-							type: 'string',
+						{
+							name: 'eventPricing',
+							in: 'query',
+							description: 'Pricing type to filter events by.',
+							required: false,
+							schema: {
+								type: 'string',
+							},
 						},
-					},
-					{
-						name: 'eventType',
-						in: 'query',
-						description: 'Event type to filter events by.',
-						required: false,
-						schema: {
-							type: 'string',
+						{
+							name: 'date',
+							in: 'query',
+							description: 'Date to filter events by (e.g., YYYY-MM-DD).',
+							required: false,
+							schema: {
+								type: 'string',
+							},
 						},
-					},
-				],
-				responses: {
-					200: {
-						description: 'Filtered events fetched successfully',
-					},
-					500: {
-						description: 'Internal server error.',
-					},
-				},
-			},
-		},
-
-		'/api/events/search': {
-			get: {
-				tags: ['Event'],
-				summary: 'Search Events',
-				description: 'This route is used to search for events by name.',
-				parameters: [
-					{
-						name: 'keyword',
-						in: 'query',
-						required: true,
-						type: 'string',
-					},
-				],
-				responses: {
-					200: {
-						description: 'Events matching the search retrieved successfully.',
-					},
-					404: {
-						description: 'No matching events found.',
-					},
-				},
-			},
-		},
-		'/api/events/calendar': {
-			get: {
-				tags: ['Event'],
-				summary: 'Get All Events (calendar)',
-				description: 'This route is used to get all events',
-				responses: {
-					200: {
-						description: 'Events retrieved successfully.',
-					},
-					404: {
-						description: 'No events found.',
-					},
-				},
-			},
-		},
-
-		'/api/events/{eventId}': {
-			get: {
-				tags: ['Event'],
-				summary: 'Get Event by ID',
-				description: 'This route is used to get a particular event by its ID.',
-				parameters: [
-					{
-						name: 'eventId',
-						in: 'path',
-						required: true,
-						type: 'string',
-					},
-				],
-				responses: {
-					200: {
-						description: 'Event retrieved successfully.',
-					},
-					404: {
-						description: 'Specified event does not exist.',
-					},
-				},
-			},
-			put: {
-				tags: ['Event'],
-				summary: 'Update Event',
-				description: 'This route is used to update an event.',
-				parameters: [
-					{
-						name: 'eventId',
-						in: 'path',
-						required: true,
-						type: 'string',
-					},
-				],
-				responses: {
-					201: {
-						description: 'Event updated successfully.',
-					},
-					500: {
-						description: 'Error updating event.',
-					},
-				},
-			},
-			delete: {
-				tags: ['Event'],
-				summary: 'Delete Event',
-				description: 'This route is used to delete a particular event.',
-				parameters: [
-					{
-						name: 'eventId',
-						in: 'path',
-						required: true,
-						type: 'string',
-					},
-				],
-				responses: {
-					200: {
-						description: 'Event deleted successfully.',
-					},
-					404: {
-						description: 'Event not found.',
-					},
-				},
-			},
-		},
-
-		'/api/user/settings': {
-			get: {
-				tags: ['User'],
-				summary: 'Get User Preferences Settings',
-				description: 'This route is used to get a particular user preferences settings',
-				responses: {
-					200: {
-						description: 'User preferences retrieved successfully.',
-					},
-					404: {
-						description: 'User preferences not found.',
-					},
-					500: {
-						description: 'An error occurred while fetching user preferences',
+						{
+							name: 'eventType',
+							in: 'query',
+							description: 'Event type to filter events by.',
+							required: false,
+							schema: {
+								type: 'string',
+							},
+						},
+					],
+					responses: {
+						200: {
+							description: 'Filtered events fetched successfully',
+						},
+						500: {
+							description: 'Internal server error.',
+						},
 					},
 				},
 			},
 
-			post: {
-				tags: ['User'],
-				summary: 'Update The User Preferences Settings',
-				description: 'This route is used to update a particular user preference',
-				responses: {
-					200: {
-						description: 'User preference saved successfully',
+			'/api/events/search': {
+				get: {
+					tags: ['Event'],
+					summary: 'Search Events',
+					description: 'This route is used to search for events by name.',
+					parameters: [
+						{
+							name: 'keyword',
+							in: 'query',
+							required: true,
+							type: 'string',
+						},
+					],
+					responses: {
+						200: {
+							description: 'Events matching the search retrieved successfully.',
+						},
+						404: {
+							description: 'No matching events found.',
+						},
 					},
+				},
+			},
+			'/api/events/calendar': {
+				get: {
+					tags: ['Event'],
+					summary: 'Get All Events (calendar)',
+					description: 'This route is used to get all events',
+					responses: {
+						200: {
+							description: 'Events retrieved successfully.',
+						},
+						404: {
+							description: 'No events found.',
+						},
+					},
+				},
+			},
 
-					500: {
-						description: 'An error occurred while saving user preference',
+			'/api/events/{eventId}': {
+				get: {
+					tags: ['Event'],
+					summary: 'Get Event by ID',
+					description: 'This route is used to get a particular event by its ID.',
+					parameters: [
+						{
+							name: 'eventId',
+							in: 'path',
+							required: true,
+							type: 'string',
+						},
+					],
+					responses: {
+						200: {
+							description: 'Event retrieved successfully.',
+						},
+						404: {
+							description: 'Specified event does not exist.',
+						},
+					},
+				},
+				put: {
+					tags: ['Event'],
+					summary: 'Update Event',
+					description: 'This route is used to update an event.',
+					parameters: [
+						{
+							name: 'eventId',
+							in: 'path',
+							required: true,
+							type: 'string',
+						},
+					],
+					responses: {
+						201: {
+							description: 'Event updated successfully.',
+						},
+						500: {
+							description: 'Error updating event.',
+						},
+					},
+				},
+				delete: {
+					tags: ['Event'],
+					summary: 'Delete Event',
+					description: 'This route is used to delete a particular event.',
+					parameters: [
+						{
+							name: 'eventId',
+							in: 'path',
+							required: true,
+							type: 'string',
+						},
+					],
+					responses: {
+						200: {
+							description: 'Event deleted successfully.',
+						},
+						404: {
+							description: 'Event not found.',
+						},
+					},
+				},
+			},
+
+			'/api/user/settings': {
+				get: {
+					tags: ['User'],
+					summary: 'Get User Preferences Settings',
+					description: 'This route is used to get a particular user preferences settings',
+					responses: {
+						200: {
+							description: 'User preferences retrieved successfully.',
+						},
+						404: {
+							description: 'User preferences not found.',
+						},
+						500: {
+							description: 'An error occurred while fetching user preferences',
+						},
+					},
+				},
+
+				post: {
+					tags: ['User'],
+					summary: 'Update The User Preferences Settings',
+					description: 'This route is used to update a particular user preference',
+					responses: {
+						200: {
+							description: 'User preference saved successfully',
+						},
+
+						500: {
+							description: 'An error occurred while saving user preference',
+						},
 					},
 				},
 			},
 		},
-	},
-};
+	}
+}
 
 export default swaggerDocument;
