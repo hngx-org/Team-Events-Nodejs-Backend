@@ -151,11 +151,43 @@ const getUpcomingEvents = async (req: Request, res: Response) => {
 };
 
 const filterEvents = async (req: Request, res: Response) => {
-	const events = await prisma.event.findMany();
-	if (events.length > 0) {
-		res.status(200).json(events);
-	} else {
-		res.status(404).json({ error: 'No events found' });
+	try {
+		const dateString = req.query.date as string;
+		const eventPricing = req.query.eventPricing as string;
+
+		// Parse the date string into a Date object
+		const date = new Date(dateString);
+		if (isNaN(date.getTime())) {
+			return res.status(400).json({ error: 'Invalid date format' });
+		}
+
+		// Define a base query to retrieve events
+		let eventsQuery = prisma.event.findMany({
+			where: {
+				startDate: { gte: date },
+			},
+		});
+
+		// Execute the query and get the events as an array
+		const allEvents = await eventsQuery;
+
+		// Apply additional filters based on event pricing
+		let filteredEvents = allEvents;
+		if (eventPricing) {
+			if (eventPricing === 'Free') {
+				filteredEvents = allEvents.filter((event) => !event.isPaidEvent);
+			} else if (eventPricing === 'Paid') {
+				filteredEvents = allEvents.filter((event) => event.isPaidEvent);
+			}
+		}
+
+		res.status(200).json({
+			message: 'Events filtered successfully',
+			data: filteredEvents,
+		});
+	} catch (error) {
+		console.error('Error filtering events:', error);
+		res.status(500).json({ error: 'An error occurred while filtering events' });
 	}
 };
 
