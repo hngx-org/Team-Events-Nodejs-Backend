@@ -1,6 +1,9 @@
 import { PrismaClient, User } from '@prisma/client';
 import { Request, Response } from 'express';
 import Joi from 'joi';
+import { hashPassword, verifyPassword } from '../utils/hashPassword';
+import cloudinary from '../config/cloudinaryConfig';
+
 const prisma = new PrismaClient();
 
 const getUserPreference = async (req: Request, res: Response) => {
@@ -57,4 +60,166 @@ const updateUserPreference = async (req: Request, res: Response) => {
 	}
 };
 
-export { getUserPreference, updateUserPreference };
+const changePassword = async (req: Request, res: Response) => {
+	try {
+		const email = (req.user as User).email;
+
+		const passwordSchema = Joi.object({
+			currentPassword: Joi.string().min(8).required(),
+			newPassword: Joi.string().min(8).required(),
+			confirmNewPassword: Joi.ref('newPassword'),
+		}).with('newPassword', 'confirmNewPassword');
+
+		const { error, value } = passwordSchema.validate(req.body);
+
+		if (error) {
+			res.status(400).json({
+				status: `error`,
+				message: `Password mismatch`,
+				success: false,
+				error: error.details[0].message,
+			});
+		}
+
+		const user = await prisma.user.findUnique({
+			where: {
+				email: email,
+			},
+		});
+
+		if (!user) {
+			res.status(400).json({
+				status: `error`,
+				message: `user not found`,
+				success: false,
+			});
+		}
+
+		const isPasswordMatch = await verifyPassword(value.currentPassword, user.password);
+
+		if (!isPasswordMatch) {
+			res.status(400).json({
+				status: `error`,
+				message: `Incorrect current password input`,
+				success: false,
+			});
+		}
+
+		const hashedPassword = await hashPassword(value.newPassword);
+
+		const updatedUser = await prisma.user.update({
+			where: {
+				email: email,
+			},
+			data: {
+				password: hashedPassword,
+			},
+		});
+
+		if (!updatedUser) {
+			res.status(400).json({
+				status: `error`,
+				message: `password failed to update`,
+				success: false,
+			});
+		}
+
+		res.status(200).json({
+			status: `success`,
+			message: `password successfully updated`,
+			success: true,
+			data: {
+				id: updatedUser.id,
+				email: updatedUser.email,
+				username: updatedUser.username,
+				firstname: updatedUser.firstname,
+				lastname: updatedUser.lastname,
+				avatar: updatedUser.avatar,
+			},
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({
+			status: `error`,
+			message: `internet error`,
+			success: false,
+		});
+	}
+};
+
+const updateUserProfile = async (req: Request, res: Response) => {
+	try {
+		const email = (req.user as User).email;
+
+		const profileSchema = Joi.object({
+			firstname: Joi.string(),
+			lastname: Joi.string(),
+			phonenumber: Joi.string(),
+		});
+
+		const { error, value } = profileSchema.validate(req.body);
+
+		if (error) {
+			res.status(400).json({
+				status: `error`,
+				message: `missing input field`,
+				success: false,
+				error: error.details[0].message,
+			});
+		}
+
+		const user = await prisma.user.findFirst({
+			where: {
+				email: email,
+			},
+		});
+
+		if (!user) {
+			res.status(400).json({
+				status: `error`,
+				message: `user not found`,
+				success: false,
+			});
+		}
+
+		let uploadedImage = '';
+		if (req.file) {
+			// File upload (Cloudinary)
+			const { secure_url } = await cloudinary.uploader.upload(req.file.path);
+			uploadedImage = secure_url;
+		}
+
+		const updatedUser = await prisma.user.update({
+			where: { email: email },
+			data: {
+				firstname: value.firstname,
+				lastname: value.lastname,
+				phone_no: value.phonenumber,
+				avatar: uploadedImage,
+			},
+		});
+
+		res.status(200).json({
+			status: `success`,
+			message: `user profile successfully updated`,
+			success: true,
+			data: {
+				id: updatedUser.id,
+				email: updatedUser.email,
+				username: updatedUser.username,
+				firstname: updatedUser.firstname,
+				lastname: updatedUser.lastname,
+				avatar: updatedUser.avatar,
+			},
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({
+			status: `error`,
+			message: `internet error`,
+			success: false,
+		});
+	}
+};
+
+export { getUserPreference, updateUserPreference, changePassword, updateUserProfile };
