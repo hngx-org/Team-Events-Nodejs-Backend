@@ -169,6 +169,44 @@ const getAllEvents = async (req: Request, res: Response) => {
 	}
 };
 
+const getCreatedEvents = async (req: Request, res: Response) => {
+	try {
+		const requestSchema = Joi.object({
+			userId: Joi.string().required(),
+		});
+
+		const { error, value } = requestSchema.validate(req.params);
+		if (error) return res.status(400).json({ error: error.details[0].message });
+
+		const { userId } = value;
+
+		const userEvents = await prisma.user.findUnique({
+			where: {
+				id: userId,
+			},
+			include: {
+				event: true,
+			},
+		});
+
+		if (!userEvents) {
+			return res.status(404).json({ error: 'User not found' });
+		}
+
+		const createdEvents = userEvents.event;
+
+		// Respond with the user's created events
+		res.status(200).json({
+			statusCode: 200,
+			message: 'User events retrieved successfully',
+			data: createdEvents,
+		});
+	} catch (error) {
+		console.error('Error getting user events:', error);
+		res.status(500).json({ error: 'Error getting user events' });
+	}
+};
+
 const getEventsCalendar = async (req: Request, res: Response) => {
 	// Get all events
 	const events = await prisma.event.findMany();
@@ -427,6 +465,7 @@ export {
 	getAllEvents,
 	getEventById,
 	getEventsCalendar,
+	getCreatedEvents,
 	getUpcomingEvents,
 	registerUserForEvent,
 	unregisterUserForEvent,
