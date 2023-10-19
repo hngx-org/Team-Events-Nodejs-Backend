@@ -270,11 +270,37 @@ const getEventById = async (req: Request, res: Response) => {
 	});
 };
 
-const registerForEvent = async (req: Request, res: Response) => {
+const registerUserForEvent = async (req: Request, res: Response) => {
 	try {
-		res.json({ error: 'Still in development' });
+		const userId = (req.user as User).id;
+		const eventId = req.params.eventId;
+
+		// Check if the event exists
+		const event = await prisma.event.findUnique({
+			where: { id: eventId },
+		});
+		if (!event) return res.status(404).json({ error: 'Event not found' });
+
+		// Check if the user is already registered for the event
+		const existingRegistration = await prisma.userEvent.findFirst({
+			where: { userId, eventId },
+		});
+		if (existingRegistration) {
+			return res.status(400).json({ error: 'You are already registered for this event' });
+		}
+
+		// Create a new user event registration
+		const registration = await prisma.userEvent.create({
+			data: { userId, eventId },
+		});
+
+		res.status(201).json({
+			message: 'User registered for the event successfully',
+			data: registration,
+		});
 	} catch (error) {
-		//
+		console.error('Error registering user for the event:', error);
+		res.status(500).json({ error: 'Internal server error' });
 	}
 };
 
@@ -309,6 +335,6 @@ export {
 	getEventById,
 	getEventsCalendar,
 	getUpcomingEvents,
-	registerForEvent,
+	registerUserForEvent,
 	updateEvent,
 };
