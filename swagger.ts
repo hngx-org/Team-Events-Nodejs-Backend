@@ -709,6 +709,32 @@ const swaggerDocument = {
 				},
 			},
 		},
+		'/api/user/onboarding': {
+			post: {
+				tags: ['User'],
+				summary: 'Save User Onboarding Info',
+				// description: '',
+				requestBody: {
+					required: true,
+					content: {
+						'application/json': {
+							example: {
+								tags: ['tech, games'],
+								location: 'Lagos',
+							},
+						},
+					},
+				},
+				responses: {
+					200: {
+						description: 'Onboarding info saved successfully.',
+					},
+					500: {
+						description: 'Internal server error. An error occurred while processing the request.',
+					},
+				},
+			},
+		},
 		'/api/user/update-profile': {
 			put: {
 				tags: ['User'],

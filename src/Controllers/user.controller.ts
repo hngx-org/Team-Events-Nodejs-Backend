@@ -220,6 +220,40 @@ const updateUserProfile = async (req: Request, res: Response) => {
 	}
 };
 
+const saveOnboardingInfo = async (req: Request, res: Response) => {
+	try {
+		const email = (req.user as User).email;
+
+		const profileSchema = Joi.object({
+			tags: Joi.array(),
+			location: Joi.string(),
+		});
+
+		const { error, value } = profileSchema.validate(req.body);
+		if (error) return res.status(400).json({ error: error.details[0].message });
+
+		const user = await prisma.user.findFirst({
+			where: {
+				email: email,
+			},
+		});
+		if (!user) return res.status(400).json({ error: `User not found` });
+
+		await prisma.user.update({
+			where: { email: email },
+			data: { interests: value.tags || user.interests, location: value.location || user.location },
+		});
+
+		res.status(200).json({
+			message: `Onboarding info saved successfully.`,
+			success: true,
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ message: `internet error`, success: false });
+	}
+};
+
 const getUserRegisteredEvents = async (req: Request, res: Response) => {
 	try {
 		const userId = (req.user as User).id;
@@ -267,4 +301,5 @@ export {
 	changePassword,
 	updateUserProfile,
 	getUserRegisteredEvents,
+	saveOnboardingInfo,
 };
