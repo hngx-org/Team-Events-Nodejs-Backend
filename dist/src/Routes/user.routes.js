@@ -24,5 +24,13 @@ router.put('/update-profile', multer_cloudinary_config_1.default.single('avatar'
  * This route should
  */
 router.patch('/change-password', auth_middleware_1.default, user_controller_1.changePassword);
+/*@GET /user/onboarding
+ * This route should
+ */
+router.post('/onboarding', auth_middleware_1.default, user_controller_1.saveOnboardingInfo);
+/*@GET /user/events
+ * This route should
+ */
+router.get('/events', auth_middleware_1.default, user_controller_1.getUserRegisteredEvents);
 exports.default = router;
 //# sourceMappingURL=user.routes.js.map

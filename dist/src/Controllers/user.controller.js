@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUserProfile = exports.changePassword = exports.updateUserPreference = exports.getUserPreference = void 0;
+exports.saveOnboardingInfo = exports.getUserRegisteredEvents = exports.updateUserProfile = exports.changePassword = exports.updateUserPreference = exports.getUserPreference = void 0;
 const client_1 = require("@prisma/client");
 const joi_1 = __importDefault(require("joi"));
 const hashPassword_1 = require("../utils/hashPassword");
@@ -38,21 +38,52 @@ const updateUserPreference = async (req, res) => {
             networking_opportunities: joi_1.default.boolean().required(),
             email_notifications: joi_1.default.boolean().required(),
             push_notifications: joi_1.default.boolean().required(),
+            allow_others_see_profile: joi_1.default.boolean().required(),
+            event_details: joi_1.default.boolean().required(),
+            anyone_can_add_to_group: joi_1.default.boolean().required(),
         });
         const { error, value } = requestSchema.validate(req.body);
         if (error)
             return res.status(400).json({ error: error.details[0].message });
         const userId = req.user.id;
-        const userPreference = await prisma.userPreference.create({
-            data: {
+        const isUserPreferenceExist = await prisma.userPreference.findFirst({
+            where: {
                 user_id: userId,
-                event_update: value.event_updates,
-                Reminders: value.reminders,
-                networking_opportunities: value.networking_opportunities,
-                email_notifications: value.email_notifications,
-                push_notifications: value.push_notifications,
             },
         });
+        let userPreference;
+        if (!isUserPreferenceExist) {
+            userPreference = await prisma.userPreference.create({
+                data: {
+                    user_id: userId,
+                    event_update: value.event_updates,
+                    Reminders: value.reminders,
+                    networking_opportunities: value.networking_opportunities,
+                    email_notifications: value.email_notifications,
+                    push_notifications: value.push_notifications,
+                    allow_others_see_profile: value.allow_others_see_profile,
+                    event_details: value.event_details,
+                    anyone_can_add_to_group: value.anyone_can_add_to_group,
+                },
+            });
+        }
+        else {
+            userPreference = await prisma.userPreference.update({
+                where: {
+                    id: isUserPreferenceExist.id,
+                },
+                data: {
+                    event_update: value.event_updates,
+                    Reminders: value.reminders,
+                    networking_opportunities: value.networking_opportunities,
+                    email_notifications: value.email_notifications,
+                    push_notifications: value.push_notifications,
+                    allow_others_see_profile: value.allow_others_see_profile,
+                    event_details: value.event_details,
+                    anyone_can_add_to_group: value.anyone_can_add_to_group,
+                },
+            });
+        }
         return res.status(200).json({ message: 'User preference saved successfully', data: userPreference });
     }
     catch (error) {
@@ -105,17 +136,8 @@ const changePassword = async (req, res) => {
             });
         }
         res.status(200).json({
-            status: `success`,
-            message: `password successfully updated`,
+            message: `Password successfully updated`,
             success: true,
-            data: {
-                id: updatedUser.id,
-                email: updatedUser.email,
-                username: updatedUser.username,
-                firstname: updatedUser.firstname,
-                lastname: updatedUser.lastname,
-                avatar: updatedUser.avatar,
-            },
         });
     }
     catch (error) {
@@ -132,9 +154,9 @@ const updateUserProfile = async (req, res) => {
     try {
         const email = req.user.email;
         const profileSchema = joi_1.default.object({
-            firstname: joi_1.default.string(),
-            lastname: joi_1.default.string(),
-            phonenumber: joi_1.default.string(),
+            prefix: joi_1.default.string(),
+            fullName: joi_1.default.string(),
+            phoneNumber: joi_1.default.string(),
         });
         const { error, value } = profileSchema.validate(req.body);
         if (error) {
@@ -156,10 +178,10 @@ const updateUserProfile = async (req, res) => {
         const updatedUser = await prisma.user.update({
             where: { email: email },
             data: {
-                firstname: value.firstname,
-                lastname: value.lastname,
-                phone_no: value.phonenumber,
-                avatar: uploadedImage,
+                prefix: value.prefix || user.prefix,
+                username: value.fullName || user.username,
+                phone_no: value.phoneNumber || user.phone_no,
+                avatar: uploadedImage || user.avatar,
             },
         });
         res.status(200).json({
@@ -168,9 +190,8 @@ const updateUserProfile = async (req, res) => {
             data: {
                 id: updatedUser.id,
                 email: updatedUser.email,
+                prefix: updatedUser.prefix,
                 username: updatedUser.username,
-                firstname: updatedUser.firstname,
-                lastname: updatedUser.lastname,
                 avatar: updatedUser.avatar,
             },
         });
@@ -184,4 +205,74 @@ const updateUserProfile = async (req, res) => {
     }
 };
 exports.updateUserProfile = updateUserProfile;
+const saveOnboardingInfo = async (req, res) => {
+    try {
+        const email = req.user.email;
+        const profileSchema = joi_1.default.object({
+            tags: joi_1.default.array(),
+            location: joi_1.default.string(),
+        });
+        const { error, value } = profileSchema.validate(req.body);
+        if (error)
+            return res.status(400).json({ error: error.details[0].message });
+        const user = await prisma.user.findFirst({
+            where: {
+                email: email,
+            },
+        });
+        if (!user)
+            return res.status(400).json({ error: `User not found` });
+        await prisma.user.update({
+            where: { email: email },
+            data: { interests: value.tags || user.interests, location: value.location || user.location },
+        });
+        res.status(200).json({
+            message: `Onboarding info saved successfully.`,
+            success: true,
+        });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ message: `internet error`, success: false });
+    }
+};
+exports.saveOnboardingInfo = saveOnboardingInfo;
+const getUserRegisteredEvents = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
+        });
+        if (!user)
+            return res.status(400).json({ error: `User not found` });
+        const userEvents = await prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
+            include: {
+                event: true,
+            },
+        });
+        if (!userEvents) {
+            return res.status(404).json({ error: 'User or Event not found' });
+        }
+        const userRegisteredEvents = userEvents.event;
+        // Respond with the user's created events
+        res.status(200).json({
+            statusCode: 200,
+            message: 'User events retrieved successfully',
+            data: userRegisteredEvents,
+        });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: `internet error`,
+            success: false,
+        });
+    }
+};
+exports.getUserRegisteredEvents = getUserRegisteredEvents;
 //# sourceMappingURL=user.controller.js.map
