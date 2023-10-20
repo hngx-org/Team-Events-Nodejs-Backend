@@ -172,26 +172,21 @@ const getCreatedEvents = async (req: Request, res: Response) => {
 	try {
 		const userId = (req.user as User).id;
 
-		const userEvents = await prisma.user.findUnique({
+		const organizerEvents = await prisma.event.findMany({
 			where: {
-				id: userId,
-			},
-			include: {
-				event: true,
+				organizerId: userId,
 			},
 		});
 
-		if (!userEvents) {
-			return res.status(404).json({ error: 'User not found' });
+		if (!organizerEvents) {
+			return res.status(404).json({ error: 'Organizer not found' });
 		}
-
-		const createdEvents = userEvents.event;
 
 		// Respond with the user's created events
 		res.status(200).json({
 			statusCode: 200,
-			message: 'User events retrieved successfully',
-			data: createdEvents,
+			message: 'Organizer events retrieved successfully',
+			data: organizerEvents,
 		});
 	} catch (error) {
 		console.error('Error getting user events:', error);

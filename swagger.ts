@@ -575,13 +575,13 @@ const swaggerDocument = {
 				description: 'This endpoint would get all the events created by the current user.',
 				responses: {
 					200: {
-						description: 'User events retrieved successfully',
+						description: 'Organizer events retrieved successfully',
 					},
 					404: {
-						description: 'User not found',
+						description: 'Organizer not found',
 					},
 					500: {
-						description: 'Error getting user events',
+						description: 'Error getting organizer events',
 					},
 				},
 			},
@@ -799,6 +799,25 @@ const swaggerDocument = {
 					},
 				},
 			},
+		},
+		'/api/user/user-registered-events': {
+			get: {
+				tags: ['User'],
+				summary: 'Get User Registered Events',
+				description: 'This route is used to get a particular user registered events',
+				responses: {
+					200: {
+						description: 'User events retrieved successfully.',
+					},
+					404: {
+						description: 'User or Events not found.',
+					},
+					500: {
+						description: 'An error occurred while fetching user registered events',
+					},
+				},
+			},
+
 		},
 	},
 };
