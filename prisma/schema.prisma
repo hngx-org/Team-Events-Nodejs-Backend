@@ -13,14 +13,16 @@ datasource db {
 model User {
   id String @id @default(uuid())
 
-  email     String  @unique
-  password  String?
+  email    String  @unique
+  password String?
+
+  prefix    String?
   username  String?
-  firstname String?
-  lastname  String?
   avatar    String?
   phone_no  String?
   gender    String?
+  interests String[] @default([])
+  location  String?
 
   auth_method       Auth
   auth_id           String?

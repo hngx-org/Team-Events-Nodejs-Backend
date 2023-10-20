@@ -5,6 +5,7 @@ import {
 	changePassword,
 	getUserPreference,
 	getUserRegisteredEvents,
+	saveOnboardingInfo,
 	updateUserPreference,
 	updateUserProfile,
 } from '../Controllers/user.controller';
@@ -30,11 +31,14 @@ router.put('/update-profile', upload.single('avatar'), protect, updateUserProfil
  */
 router.patch('/change-password', protect, changePassword);
 
-/*@GET /user
+/*@GET /user/onboarding
  * This route should
  */
+router.post('/onboarding', protect, saveOnboardingInfo);
 
-router.get('/user-registered-events', protect, getUserRegisteredEvents)
-
+/*@GET /user/events
+ * This route should
+ */
+router.get('/events', protect, getUserRegisteredEvents);
 
 export default router;

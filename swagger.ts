@@ -691,6 +691,50 @@ const swaggerDocument = {
 			},
 		},
 
+		'/api/user/events': {
+			get: {
+				tags: ['User'],
+				summary: 'Get User Registered Events',
+				description: 'This route is used to get a particular user registered events',
+				responses: {
+					200: {
+						description: 'User events retrieved successfully.',
+					},
+					404: {
+						description: 'User or Events not found.',
+					},
+					500: {
+						description: 'An error occurred while fetching user registered events',
+					},
+				},
+			},
+		},
+		'/api/user/onboarding': {
+			post: {
+				tags: ['User'],
+				summary: 'Save User Onboarding Info',
+				// description: '',
+				requestBody: {
+					required: true,
+					content: {
+						'application/json': {
+							example: {
+								tags: ['tech, games'],
+								location: 'Lagos',
+							},
+						},
+					},
+				},
+				responses: {
+					200: {
+						description: 'Onboarding info saved successfully.',
+					},
+					500: {
+						description: 'Internal server error. An error occurred while processing the request.',
+					},
+				},
+			},
+		},
 		'/api/user/update-profile': {
 			put: {
 				tags: ['User'],
@@ -704,15 +748,15 @@ const swaggerDocument = {
 							schema: {
 								type: 'object',
 								properties: {
-									firstname: {
+									prefix: {
 										type: 'string',
-										description: "User's first name.",
+										description: "User's prefix.",
 									},
-									lastname: {
+									fullName: {
 										type: 'string',
-										description: "User's last name.",
+										description: "User's full name.",
 									},
-									phonenumber: {
+									phoneNumber: {
 										type: 'string',
 										description: "User's phone number.",
 									},
@@ -799,25 +843,6 @@ const swaggerDocument = {
 					},
 				},
 			},
-		},
-		'/api/user/user-registered-events': {
-			get: {
-				tags: ['User'],
-				summary: 'Get User Registered Events',
-				description: 'This route is used to get a particular user registered events',
-				responses: {
-					200: {
-						description: 'User events retrieved successfully.',
-					},
-					404: {
-						description: 'User or Events not found.',
-					},
-					500: {
-						description: 'An error occurred while fetching user registered events',
-					},
-				},
-			},
-
 		},
 	},
 };
