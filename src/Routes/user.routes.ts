@@ -30,11 +30,9 @@ router.put('/update-profile', upload.single('avatar'), protect, updateUserProfil
  */
 router.patch('/change-password', protect, changePassword);
 
-/*@GET /user
+/*@GET /user/events
  * This route should
  */
-
-router.get('/user-registered-events', protect, getUserRegisteredEvents)
-
+router.get('/events', protect, getUserRegisteredEvents);
 
 export default router;

@@ -691,6 +691,24 @@ const swaggerDocument = {
 			},
 		},
 
+		'/api/user/events': {
+			get: {
+				tags: ['User'],
+				summary: 'Get User Registered Events',
+				description: 'This route is used to get a particular user registered events',
+				responses: {
+					200: {
+						description: 'User events retrieved successfully.',
+					},
+					404: {
+						description: 'User or Events not found.',
+					},
+					500: {
+						description: 'An error occurred while fetching user registered events',
+					},
+				},
+			},
+		},
 		'/api/user/update-profile': {
 			put: {
 				tags: ['User'],
@@ -799,25 +817,6 @@ const swaggerDocument = {
 					},
 				},
 			},
-		},
-		'/api/user/user-registered-events': {
-			get: {
-				tags: ['User'],
-				summary: 'Get User Registered Events',
-				description: 'This route is used to get a particular user registered events',
-				responses: {
-					200: {
-						description: 'User events retrieved successfully.',
-					},
-					404: {
-						description: 'User or Events not found.',
-					},
-					500: {
-						description: 'An error occurred while fetching user registered events',
-					},
-				},
-			},
-
 		},
 	},
 };
