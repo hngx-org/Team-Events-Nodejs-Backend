@@ -4,6 +4,8 @@ import upload from '../config/multer-cloudinary-config';
 import {
 	changePassword,
 	getUserPreference,
+	getUserRegisteredEvents,
+	saveOnboardingInfo,
 	updateUserPreference,
 	updateUserProfile,
 } from '../Controllers/user.controller';
@@ -28,5 +30,15 @@ router.put('/update-profile', upload.single('avatar'), protect, updateUserProfil
  * This route should
  */
 router.patch('/change-password', protect, changePassword);
+
+/*@GET /user/onboarding
+ * This route should
+ */
+router.post('/onboarding', protect, saveOnboardingInfo);
+
+/*@GET /user/events
+ * This route should
+ */
+router.get('/events', protect, getUserRegisteredEvents);
 
 export default router;
