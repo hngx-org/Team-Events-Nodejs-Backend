@@ -722,15 +722,15 @@ const swaggerDocument = {
 							schema: {
 								type: 'object',
 								properties: {
-									firstname: {
+									prefix: {
 										type: 'string',
-										description: "User's first name.",
+										description: "User's prefix.",
 									},
-									lastname: {
+									fullName: {
 										type: 'string',
-										description: "User's last name.",
+										description: "User's full name.",
 									},
-									phonenumber: {
+									phoneNumber: {
 										type: 'string',
 										description: "User's phone number.",
 									},

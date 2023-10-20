@@ -147,17 +147,8 @@ const changePassword = async (req: Request, res: Response) => {
 		}
 
 		res.status(200).json({
-			status: `success`,
-			message: `password successfully updated`,
+			message: `Password successfully updated`,
 			success: true,
-			data: {
-				id: updatedUser.id,
-				email: updatedUser.email,
-				username: updatedUser.username,
-				firstname: updatedUser.firstname,
-				lastname: updatedUser.lastname,
-				avatar: updatedUser.avatar,
-			},
 		});
 	} catch (error) {
 		console.log(error);
@@ -174,9 +165,9 @@ const updateUserProfile = async (req: Request, res: Response) => {
 		const email = (req.user as User).email;
 
 		const profileSchema = Joi.object({
-			firstname: Joi.string(),
-			lastname: Joi.string(),
-			phonenumber: Joi.string(),
+			prefix: Joi.string(),
+			fullName: Joi.string(),
+			phoneNumber: Joi.string(),
 		});
 
 		const { error, value } = profileSchema.validate(req.body);
@@ -202,10 +193,10 @@ const updateUserProfile = async (req: Request, res: Response) => {
 		const updatedUser = await prisma.user.update({
 			where: { email: email },
 			data: {
-				firstname: value.firstname,
-				lastname: value.lastname,
-				phone_no: value.phonenumber,
-				avatar: uploadedImage,
+				prefix: value.prefix || user.prefix,
+				username: value.fullName || user.username,
+				phone_no: value.phoneNumber || user.phone_no,
+				avatar: uploadedImage || user.avatar,
 			},
 		});
 
@@ -215,9 +206,8 @@ const updateUserProfile = async (req: Request, res: Response) => {
 			data: {
 				id: updatedUser.id,
 				email: updatedUser.email,
+				prefix: updatedUser.prefix,
 				username: updatedUser.username,
-				firstname: updatedUser.firstname,
-				lastname: updatedUser.lastname,
 				avatar: updatedUser.avatar,
 			},
 		});
