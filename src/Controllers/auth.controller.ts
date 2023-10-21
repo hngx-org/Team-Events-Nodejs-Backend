@@ -54,6 +54,7 @@ const callback = async (req: Request, res: Response) => {
 					email: newUser.email,
 					username: newUser.username,
 					avatar: newUser.avatar,
+					interests: newUser.interests,
 				},
 			});
 		} else {
@@ -69,6 +70,7 @@ const callback = async (req: Request, res: Response) => {
 					email: userExists.email,
 					username: userExists.username,
 					avatar: userExists.avatar,
+					interests: userExists.interests,
 				},
 			});
 		}
@@ -202,6 +204,7 @@ const loginUser = async (req: Request, res: Response) => {
 				email: user.email,
 				username: user.username,
 				avatar: user.avatar,
+				interests: user.interests,
 			},
 		});
 	} catch (error) {
@@ -350,6 +353,5 @@ export {
 	resetPassword,
 	twitterAuth,
 	twitterAuthCallback,
-	verifyEmail
+	verifyEmail,
 };
-
