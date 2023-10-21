@@ -168,6 +168,7 @@ const updateUserProfile = async (req: Request, res: Response) => {
 			prefix: Joi.string(),
 			fullName: Joi.string(),
 			phoneNumber: Joi.string(),
+			avatar: Joi.any(),
 		});
 
 		const { error, value } = profileSchema.validate(req.body);

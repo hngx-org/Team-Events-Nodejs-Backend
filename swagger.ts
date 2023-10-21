@@ -252,6 +252,11 @@ const swaggerDocument = {
 									numberOfAvailableTickets: { type: 'integer' },
 									registrationClosingDate: { type: 'string', format: 'date-time' },
 									// Add an image field here if needed
+									image: {
+										type: 'string',
+										format: 'binary',
+										description: 'Event image.',
+									},
 								},
 							},
 						},

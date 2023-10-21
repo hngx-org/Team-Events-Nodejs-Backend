@@ -26,6 +26,7 @@ const createEvent = async (req: Request, res: Response) => {
 			}),
 			numberOfAvailableTickets: Joi.number().required(),
 			registrationClosingDate: Joi.date().iso().required(),
+			image: Joi.any(),
 		});
 
 		const { error, value } = requestSchema.validate(req.body);
@@ -103,6 +104,7 @@ const updateEvent = async (req: Request, res: Response) => {
 			}),
 			numberOfAvailableTickets: Joi.number(),
 			registrationClosingDate: Joi.date().iso(),
+			image: Joi.any(),
 		});
 
 		const { error, value } = updateSchema.validate(req.body);

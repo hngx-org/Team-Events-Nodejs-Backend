@@ -54,6 +54,11 @@ const callback = async (req: Request, res: Response) => {
 					email: newUser.email,
 					username: newUser.username,
 					avatar: newUser.avatar,
+					interests: newUser.interests,
+					location: newUser.location,
+					prefix: newUser.prefix,
+					gender: newUser.gender,
+					phone_no: newUser.phone_no,
 				},
 			});
 		} else {
@@ -69,6 +74,11 @@ const callback = async (req: Request, res: Response) => {
 					email: userExists.email,
 					username: userExists.username,
 					avatar: userExists.avatar,
+					interests: userExists.interests,
+					location: userExists.location,
+					prefix: userExists.prefix,
+					gender: userExists.gender,
+					phone_no: userExists.phone_no,
 				},
 			});
 		}
@@ -133,7 +143,7 @@ const registerUser = async (req: Request, res: Response) => {
 const verifyEmail = async (req: Request, res: Response) => {
 	try {
 		// const redirectURL: string = 'http://localhost:3000/timeline/?email_verified=';
-		const redirectURL: string = 'https://event-tan-iota.vercel.app/timeline/?email_verified=';
+		const redirectURL: string = 'https://event-tan-iota.vercel.app/onboarding/?email_verified=';
 		const { token } = req.query;
 		const user = await prisma.user.findFirst({
 			where: {
@@ -202,6 +212,11 @@ const loginUser = async (req: Request, res: Response) => {
 				email: user.email,
 				username: user.username,
 				avatar: user.avatar,
+				interests: user.interests,
+				location: user.location,
+				prefix: user.prefix,
+				gender: user.gender,
+				phone_no: user.phone_no,
 			},
 		});
 	} catch (error) {
@@ -350,6 +365,5 @@ export {
 	resetPassword,
 	twitterAuth,
 	twitterAuthCallback,
-	verifyEmail
+	verifyEmail,
 };
-
