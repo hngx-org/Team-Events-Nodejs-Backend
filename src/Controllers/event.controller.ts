@@ -411,6 +411,14 @@ const unregisterUserForEvent = async (req: Request, res: Response) => {
 };
 
 const deleteEvent = async (req: Request, res: Response) => {
+	const requestSchema = Joi.object({
+		eventId: Joi.string().required(),
+	});
+
+	const {error} = requestSchema.validate(req.params);
+	if (error) return res.status(400).json({ error: error.details[0].message });
+
+
 	try {
 		const userId = (req.user as User).id;
 		const eventId = req.params?.eventId;
@@ -451,12 +459,10 @@ export {
 	deleteEvent,
 	eventSearch,
 	filterEvents,
-	getAllEvents,
-	getEventById,
-	getEventsCalendar,
-	getCreatedEvents,
-	getUpcomingEvents,
+	getAllEvents, getCreatedEvents, getEventById,
+	getEventsCalendar, getUpcomingEvents,
 	registerUserForEvent,
 	unregisterUserForEvent,
-	updateEvent,
+	updateEvent
 };
+
